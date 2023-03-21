@@ -13,6 +13,50 @@
       "PackagePath": "staticwebassets\\app.styles.css"
     },
     {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC.htm",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC.htm"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\filelist.xml",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\filelist.xml"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image001.png",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image001.png"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image003.png",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image003.png"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image004.png",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image004.png"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image006.gif",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image006.gif"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image009.gif",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image009.gif"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\image010.gif",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\image010.gif"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\sheet001.htm",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\sheet001.htm"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\stylesheet.css",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\stylesheet.css"
+    },
+    {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\tabstrip.htm",
+      "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\tabstrip.htm"
+    },
+    {
       "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\css\\app.css",
       "PackagePath": "staticwebassets\\css\\app.css"
     },
