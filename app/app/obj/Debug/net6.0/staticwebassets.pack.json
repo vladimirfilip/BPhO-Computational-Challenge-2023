@@ -57,6 +57,10 @@
       "PackagePath": "staticwebassets\\assets\\Challenge1BPCC_files\\tabstrip.htm"
     },
     {
+      "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\challenge1bpcc.png",
+      "PackagePath": "staticwebassets\\assets\\challenge1bpcc.png"
+    },
+    {
       "Id": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\css\\app.css",
       "PackagePath": "staticwebassets\\css\\app.css"
     },

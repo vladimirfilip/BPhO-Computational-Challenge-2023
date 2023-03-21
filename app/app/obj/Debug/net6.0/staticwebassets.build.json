@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "TF7HwVcC1OU1yhpfhk234IQAFzi8L8RrDLY9Ro+orGo=",
+  "Hash": "oGH3M0auokGdlk/nONIp3CQvRsmw4GF9/PeWnju3MlM=",
   "Source": "app",
   "BasePath": "/",
   "Mode": "Root",
@@ -6849,6 +6849,23 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\assets\\Challenge1BPCC.htm"
+    },
+    {
+      "Identity": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\challenge1bpcc.png",
+      "SourceId": "app",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\",
+      "BasePath": "/",
+      "RelativePath": "assets/challenge1bpcc.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\assets\\challenge1bpcc.png"
     },
     {
       "Identity": "C:\\dev\\vlad\\Github\\bpho-comphys-challenge-2023\\app\\app\\wwwroot\\assets\\Challenge1BPCC_files\\filelist.xml",
