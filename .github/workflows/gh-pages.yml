@@ -9,7 +9,7 @@ on:
       - main
       
 permissions:
-  contents: read|write
+  contents: write
 
 jobs:
   deploy:
