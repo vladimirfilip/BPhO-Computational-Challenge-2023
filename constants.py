@@ -8,10 +8,23 @@ from decimal import Decimal
 earth_mass: Decimal = Decimal(5.9742) * Decimal(10) ** Decimal(24)
 
 
+class Planet(Enum):
+    SUN = "Sun"
+    MERCURY = "Mercury"
+    VENUS = "Venus"
+    EARTH = "Earth"
+    MARS = "Mars"
+    JUPITER = "Jupiter"
+    SATURN = "Saturn"
+    URANUS = "Uranus"
+    NEPTUNE = "Neptune"
+    PLUTO = "PLUTO"
+
+
 #
 # Measured in kg
 #
-class Masses(Enum):
+class Mass(Enum):
     SUN = Decimal(332837) * earth_mass
     MERCURY = Decimal(0.055) * earth_mass
     VENUS = Decimal(0.815) * earth_mass
@@ -27,7 +40,7 @@ class Masses(Enum):
 #
 # Scalar
 #
-class Eccentricities(Enum):
+class Eccentricity(Enum):
     SUN = 0
     MERCURY = 0.21
     VENUS = 0.01
@@ -43,7 +56,7 @@ class Eccentricities(Enum):
 #
 # Measured in A.U.
 #
-class SemiMajorAxes(Enum):
+class SemiMajorAxis(Enum):
     SUN = Decimal(0)
     MERCURY = Decimal(0.387)
     VENUS = Decimal(0.723)
@@ -59,25 +72,34 @@ class SemiMajorAxes(Enum):
 #
 # b = a(1 - eccentricity^2)
 #
-class SemiMinorAxes(Enum):
-    SUN = SemiMajorAxes.SUN.value * (Decimal(1) - Eccentricities.SUN.value ** 2)
-    MERCURY = SemiMajorAxes.MERCURY.value * (Decimal(1) - Eccentricities.MERCURY.value ** 2)
-    VENUS = SemiMajorAxes.VENUS.value * (Decimal(1) - Eccentricities.VENUS.value ** 2)
-    EARTH = SemiMajorAxes.EARTH.value * (Decimal(1) - Eccentricities.EARTH.value ** 2)
-    MARS = SemiMajorAxes.MARS.value * (Decimal(1) - Eccentricities.MARS.value ** 2)
-    JUPITER = SemiMajorAxes.JUPITER.value * (Decimal(1) - Eccentricities.JUPITER.value ** 2)
-    SATURN = SemiMajorAxes.SATURN.value * (Decimal(1) - Eccentricities.SATURN.value ** 2)
-    URANUS = SemiMajorAxes.URANUS.value * (Decimal(1) - Eccentricities.URANUS.value ** 2)
-    NEPTUNE = SemiMajorAxes.NEPTUNE.value * (Decimal(1) - Eccentricities.NEPTUNE.value ** 2)
-    PLUTO = SemiMajorAxes.PLUTO.value * (Decimal(1) - Eccentricities.PLUTO.value ** 2)
+class SemiMinorAxis(Enum):
+    SUN = SemiMajorAxis.SUN.value * (Decimal(1) - Eccentricity.SUN.value ** 2)
+    MERCURY = SemiMajorAxis.MERCURY.value * (Decimal(1) - Eccentricity.MERCURY.value ** 2)
+    VENUS = SemiMajorAxis.VENUS.value * (Decimal(1) - Eccentricity.VENUS.value ** 2)
+    EARTH = SemiMajorAxis.EARTH.value * (Decimal(1) - Eccentricity.EARTH.value ** 2)
+    MARS = SemiMajorAxis.MARS.value * (Decimal(1) - Eccentricity.MARS.value ** 2)
+    JUPITER = SemiMajorAxis.JUPITER.value * (Decimal(1) - Eccentricity.JUPITER.value ** 2)
+    SATURN = SemiMajorAxis.SATURN.value * (Decimal(1) - Eccentricity.SATURN.value ** 2)
+    URANUS = SemiMajorAxis.URANUS.value * (Decimal(1) - Eccentricity.URANUS.value ** 2)
+    NEPTUNE = SemiMajorAxis.NEPTUNE.value * (Decimal(1) - Eccentricity.NEPTUNE.value ** 2)
+    PLUTO = SemiMajorAxis.PLUTO.value * (Decimal(1) - Eccentricity.PLUTO.value ** 2)
 
 
 #
 # Measured in years
 #
-class OrbitalPeriods(Enum):
+class OrbitalPeriod(Enum):
     SUN = Decimal(0)
-    MERCURY
+    MERCURY = Decimal(0.241)
+    VENUS = Decimal(0.615)
+    EARTH = Decimal(1)
+    MARS = Decimal(1.881)
+    JUPITER = Decimal(11.861)
+    SATURN = Decimal(29.628)
+    URANUS = Decimal(84.747)
+    NEPTUNE = Decimal(166.344)
+    PLUTO = Decimal(248.348)
+
 
 class GlobalConstants(Enum):
     FRAME_RATE = 60
