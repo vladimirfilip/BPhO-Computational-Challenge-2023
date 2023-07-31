@@ -1,0 +1,47 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="DuplicatedCode" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <Languages>
+        <language minSize="49" name="Python" />
+      </Languages>
+    </inspection_tool>
+    <inspection_tool class="Eslint" enabled="true" level="WARNING" enabled_by_default="true" />
+    <inspection_tool class="PyChainedComparisonsInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoreConstantInTheMiddle" value="true" />
+    </inspection_tool>
+    <inspection_tool class="PyInterpreterInspection" enabled="false" level="WARNING" enabled_by_default="false" />
+    <inspection_tool class="PyPep8Inspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="E127" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyPep8NamingInspection" enabled="true" level="WEAK WARNING" enabled_by_default="true">
+      <option name="ignoredErrors">
+        <list>
+          <option value="N802" />
+        </list>
+      </option>
+    </inspection_tool>
+    <inspection_tool class="PyUnresolvedReferencesInspection" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="ignoredIdentifiers">
+        <list>
+          <option value="LogicByteBackend.api.models.UserProfile.*" />
+          <option value="LogicByteBackend.api.models.Question.*" />
+          <option value="LogicByteBackend.api.models.Solution.*" />
+          <option value="django.db.models.fields.related.OneToOneField.*" />
+          <option value="django.db.models.fields.DateTimeField.*" />
+          <option value="LogicByteBackend.api.models.SavedQuestion.objects" />
+          <option value="LogicByteBackend.api.models.AttemptedQuestion.*" />
+          <option value="rest_framework.authtoken.models.Token.*" />
+          <option value="LogicByteBackend.api.models.ProfilePicture.objects" />
+          <option value="LogicByteBackend.api.models.UserQuestionSession.objects" />
+          <option value="dict.pop" />
+          <option value="str.replace" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
