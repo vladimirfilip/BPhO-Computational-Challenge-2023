@@ -69,7 +69,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def switch_to(self, widget_index: int, post_func: Callable = None):
         self.central_widget.setCurrentIndex(widget_index)
         if post_func:
-            post_func(self.central_widget)
+            post_func(self.central_widget.currentWidget())
 
 
 app = QtWidgets.QApplication(sys.argv)

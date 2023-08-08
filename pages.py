@@ -17,8 +17,9 @@ class PageIndexes(Enum):
 class OrbitSimulationSettings:
     SETTINGS: dict = {
         "Centre of orbit": "Sun",
-        "Objects to show": ["Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"],
-        "Speed": 1,
+        "Objects to show": ["Sun"] + PLANETS,
+        "Animation Speed": 1,
+        "Orbit time": 1,
         "View type": "2D"
     }
 
@@ -52,8 +53,9 @@ class OrbitsPage(QtWidgets.QWidget):
     }
 
     def __init__(self, parent):
-        super().__init__()
+        super().__init__(parent)
         self.parent = parent
+        self.setParent(parent)
         root_layout = QtWidgets.QHBoxLayout()
         self.sim_settings = OrbitSimulationSettings()
         self.figure_canvas = FigureCanvas(self)
@@ -101,6 +103,8 @@ class OrbitsPage(QtWidgets.QWidget):
         self.parent.switch_to(PageIndexes.ORBITS_PAGE_SETTINGS.value)
 
     def update_graph(self):
+        print("FROM UPDATE_GRAPH")
+        print(self.sim_settings.SETTINGS)
         # Called when simulation settings have been updated
         # TODO: create new figure with new simulation settings
         pass
@@ -117,6 +121,13 @@ class OrbitsPageSettings(QtWidgets.QWidget):
     OBJECTS_TO_SHOW_OPTIONS = ["Sun"] + PLANETS
     def __init__(self, parent):
         super().__init__()
+        self.centre_of_orbit_picker = None
+        self.orbit_time_slider = None
+        self.orbit_time_indicator = None
+        self._3d_view_type_btn = None
+        self._2d_view_type_btn = None
+        self.anim_speed_indicator = None
+        self.anim_speed_slider = None
         self.objects_to_show_checkboxes: list[QtWidgets.QCheckBox] = []
         self.parent = parent
         self.settings = OrbitSimulationSettings()
@@ -141,42 +152,108 @@ class OrbitsPageSettings(QtWidgets.QWidget):
         self.set_settings_widget_states()
 
     def on_back_button_pressed(self):
-        self.parent.switch_to(PageIndexes.ORBITS_PAGE.value)
+        self.parent.switch_to(PageIndexes.ORBITS_PAGE.value, post_func=lambda w: w.update_graph())
 
     def init_settings_widgets(self):
         top_half = QtWidgets.QHBoxLayout()
         centre_of_orbit_layout = QtWidgets.QVBoxLayout()
         centre_of_orbit_layout.addWidget(QtWidgets.QLabel("Center of orbit"))
-        centre_of_orbit_picker = QtWidgets.QComboBox()
-        centre_of_orbit_picker.addItems(OrbitsPageSettings.CENTRE_OF_ORBIT_OPTIONS)
-        centre_of_orbit_picker.currentIndexChanged.connect(self.on_centre_of_orbit_changed)
-        centre_of_orbit_layout.addWidget(centre_of_orbit_picker)
+        self.centre_of_orbit_picker = QtWidgets.QComboBox()
+        self.centre_of_orbit_picker.addItems(OrbitsPageSettings.CENTRE_OF_ORBIT_OPTIONS)
+        self.centre_of_orbit_picker.currentIndexChanged.connect(self.on_centre_of_orbit_changed)
+        centre_of_orbit_layout.addWidget(self.centre_of_orbit_picker)
         top_half.addLayout(centre_of_orbit_layout)
         objects_to_show_layout = QtWidgets.QVBoxLayout()
         objects_to_show_layout.addWidget(QtWidgets.QLabel("Objects to show"))
         self.objects_to_show_checkboxes = []
         for i in range(len(OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS)):
             check_box = QtWidgets.QCheckBox(OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS[i], self)
-            check_box.stateChanged.connect(lambda: self.on_object_to_show_state_changed(i))
+            check_box.toggled.connect(lambda: self.on_object_to_show_state_changed(i))
             objects_to_show_layout.addWidget(check_box)
             self.objects_to_show_checkboxes.append(check_box)
         top_half.addLayout(objects_to_show_layout)
+        anim_speed_slider_layout = QtWidgets.QVBoxLayout()
+        anim_speed_slider_layout.addWidget(QtWidgets.QLabel("Animation Speed"))
+        self.anim_speed_slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
+        original_speed_value = 1
+        self.anim_speed_slider.setMinimum(0)
+        self.anim_speed_slider.setMaximum(10)
+        self.anim_speed_slider.setValue(original_speed_value)
+        self.anim_speed_slider.setTickPosition(QtWidgets.QSlider.TickPosition.TicksBelow)
+        self.anim_speed_slider.setTickInterval(1)
+        self.anim_speed_slider.valueChanged.connect(self.update_anim_speed)
+        anim_speed_slider_layout.addWidget(self.anim_speed_slider)
+        self.anim_speed_indicator: QtWidgets.QLabel = QtWidgets.QLabel(f"{original_speed_value}x")
+        anim_speed_slider_layout.addWidget(self.anim_speed_indicator)
+        top_half.addLayout(anim_speed_slider_layout)
         self.controls_layout.addLayout(top_half)
+        bottom_half = QtWidgets.QHBoxLayout()
+        view_type_layout = QtWidgets.QVBoxLayout()
+        view_type_layout.addWidget(QtWidgets.QLabel("View type"))
+        view_type_btn_layout = QtWidgets.QHBoxLayout()
+        self._2d_view_type_btn = QtWidgets.QRadioButton("2D")
+        self._3d_view_type_btn = QtWidgets.QRadioButton("3D")
+        self._2d_view_type_btn.toggled.connect(self._2d_view_type_toggled)
+        self._3d_view_type_btn.toggled.connect(self._3d_view_type_toggled)
+        view_type_btn_layout.addWidget(self._2d_view_type_btn)
+        view_type_btn_layout.addWidget(self._3d_view_type_btn)
+        view_type_layout.addLayout(view_type_btn_layout)
+        bottom_half.addLayout(view_type_layout)
+        orbit_time_layout = QtWidgets.QVBoxLayout()
+        orbit_time_layout.addWidget(QtWidgets.QLabel("Orbit time (for shortest orbit"))
+        self.orbit_time_slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
+        original_orbit_time_value = 1
+        self.orbit_time_slider.setMinimum(1)
+        self.orbit_time_slider.setMaximum(10)
+        self.orbit_time_slider.setValue(original_orbit_time_value)
+        self.orbit_time_slider.setTickPosition(QtWidgets.QSlider.TickPosition.TicksBelow)
+        self.orbit_time_slider.setTickInterval(1)
+        self.orbit_time_slider.valueChanged.connect(self.update_orbit_time)
+        orbit_time_layout.addWidget(self.orbit_time_slider)
+        self.orbit_time_indicator = QtWidgets.QLabel(f"{original_orbit_time_value} s")
+        orbit_time_layout.addWidget(self.orbit_time_indicator)
+        bottom_half.addLayout(orbit_time_layout)
+        self.controls_layout.addLayout(bottom_half)
 
     def set_settings_widget_states(self):
-        pass
+        centre_of_orbit_index = OrbitsPageSettings.CENTRE_OF_ORBIT_OPTIONS.index(self.settings.SETTINGS["Centre of orbit"])
+        print(centre_of_orbit_index)
+        self.centre_of_orbit_picker.setCurrentIndex(centre_of_orbit_index)
+        for i in range(len(self.objects_to_show_checkboxes)):
+            checkbox = self.objects_to_show_checkboxes[i]
+            print(checkbox.text(), checkbox.text() in self.settings.SETTINGS["Objects to show"])
+            checkbox.setChecked(checkbox.text() in self.settings.SETTINGS["Objects to show"])
 
     def on_centre_of_orbit_changed(self, new_index: int):
         self.settings.SETTINGS["Centre of orbit"] = OrbitsPageSettings.CENTRE_OF_ORBIT_OPTIONS[new_index]
 
     def on_object_to_show_state_changed(self, index: int):
+        print("EVENT CALLED")
         entry = OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS[index]
         is_checked = self.objects_to_show_checkboxes[index].isChecked()
         if not is_checked:
-            self.settings.SETTINGS["Objects to show"].remove(entry)
+            if entry in self.settings.SETTINGS["Objects to show"]:
+                self.settings.SETTINGS["Objects to show"].remove(entry)
         else:
-            assert entry not in self.settings.SETTINGS
-            self.settings.SETTINGS["Objects to show"].append(entry)
+            if entry not in self.settings.SETTINGS["Objects to show"]:
+                self.settings.SETTINGS["Objects to show"].append(entry)
+        self.settings.SETTINGS["Objects to show"] = list(set(self.settings.SETTINGS["Objects to show"]))
+
+    def update_anim_speed(self, new_value: int):
+        self.settings.SETTINGS["Animation Speed"] = new_value
+        self.anim_speed_indicator.setText(f"{new_value}x")
+
+    def update_orbit_time(self, new_value: int):
+        self.settings.SETTINGS["Orbit time"] = new_value
+        self.orbit_time_indicator.setText(f"{new_value}s")
+
+    def _2d_view_type_toggled(self):
+        self._3d_view_type_btn.setChecked(False)
+        self.settings.SETTINGS["View type"] = "2D"
+
+    def _3d_view_type_toggled(self):
+        self._2d_view_type_btn.setChecked(False)
+        self.settings.SETTINGS["View type"] = "3D"
 
 
 class SpirographPage(QtWidgets.QWidget):
