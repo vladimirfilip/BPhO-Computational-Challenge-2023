@@ -8,7 +8,7 @@ from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as Navigatio
 from matplotlib.figure import Figure
 
 from orbitsettings import OrbitSimSettings, ObjToShowCheckbox, CentreOfOrbitPicker, AnimSpeedPicker, ViewTypePicker, \
-    OrbitTimePicker
+    OrbitTimePicker, SettingsKeys, ViewType
 from spirograph import PlanetPicker, FloatPicker, IntPicker
 from core_components import ValueViewer
 
@@ -121,7 +121,13 @@ class OrbitsPageSettings(QtWidgets.QWidget):
         self.child_widgets = []
         self.parent = parent
         self.settings = OrbitSimSettings()
-        self.original_settings: dict = {k: v for k, v in self.settings.SETTINGS.items()}
+        self.original_settings: dict = {
+            SettingsKeys.CENTRE_OF_ORBIT.value: "Sun",
+            SettingsKeys.OBJECTS_TO_SHOW.value: ["Sun"] + PLANETS,
+            SettingsKeys.ANIM_SPEED.value: 1,
+            SettingsKeys.ORBIT_TIME.value: 1,
+            SettingsKeys.VIEW_TYPE.value: ViewType.TWO_D.value
+        }
         root_layout = QtWidgets.QVBoxLayout()
         button_layout = QtWidgets.QHBoxLayout()
         reset_button = QtWidgets.QPushButton("Reset")

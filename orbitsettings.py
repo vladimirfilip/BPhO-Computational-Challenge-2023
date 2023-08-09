@@ -46,7 +46,6 @@ class ObjToShowCheckbox(QtWidgets.QCheckBox):
         self.setChecked(self.text() in self.settings.SETTINGS[self.settings_key])
 
 
-
 class CentreOfOrbitPicker(QtWidgets.QVBoxLayout):
     __OPTIONS: list[str] = ["Sun"] + PLANETS
 
@@ -66,7 +65,6 @@ class CentreOfOrbitPicker(QtWidgets.QVBoxLayout):
 
     def set_state(self):
         self.combo_box.setCurrentIndex(CentreOfOrbitPicker.__OPTIONS.index(self.settings.SETTINGS[self.settings_key]))
-
 
 
 class AnimSpeedPicker(QtWidgets.QVBoxLayout):
@@ -97,7 +95,6 @@ class AnimSpeedPicker(QtWidgets.QVBoxLayout):
 
     def set_state(self):
         self.anim_speed_slider.setValue(self.settings.SETTINGS[self.settings_key])
-
 
 
 class ViewTypePicker(QtWidgets.QVBoxLayout):
