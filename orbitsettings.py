@@ -34,6 +34,7 @@ class ObjToShowCheckbox(QtWidgets.QCheckBox):
         self.settings_key: str = SettingsKeys.OBJECTS_TO_SHOW.value
         self.set_state()
         self.toggled.connect(self.update_obj_to_show)
+        self.setFixedWidth(100)
 
     def update_obj_to_show(self):
         if self.isChecked():
@@ -53,12 +54,17 @@ class CentreOfOrbitPicker(QtWidgets.QVBoxLayout):
         super().__init__(*args, **kwargs)
         self.settings: OrbitSimSettings = settings
         self.settings_key: str = SettingsKeys.CENTRE_OF_ORBIT.value
-        self.addWidget(QtWidgets.QLabel("Centre of orbit"))
+        self.label = QtWidgets.QLabel("Centre of orbit")
+        self.label.setFixedWidth(100)
+        self.label.setFixedHeight(16)
+        self.addWidget(self.label)
         self.combo_box: QtWidgets.QComboBox = QtWidgets.QComboBox()
         self.combo_box.addItems(CentreOfOrbitPicker.__OPTIONS)
+        self.combo_box.setFixedWidth(100)
         self.set_state()
         self.combo_box.currentIndexChanged.connect(self.update_centre_of_orbit)
         self.addWidget(self.combo_box)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
 
     def update_centre_of_orbit(self, new_index: int):
         self.settings.SETTINGS[self.settings_key] = CentreOfOrbitPicker.__OPTIONS[new_index]
@@ -76,10 +82,15 @@ class AnimSpeedPicker(QtWidgets.QVBoxLayout):
         super().__init__(*args, **kwargs)
         self.settings: OrbitSimSettings = settings
         self.settings_key: str = SettingsKeys.ANIM_SPEED.value
-        self.addWidget(QtWidgets.QLabel("Animation speed"))
+        self.label = QtWidgets.QLabel("Animation speed")
+        self.label.setMaximumWidth(150)
+        self.label.setFixedHeight(16)
+        self.addWidget(self.label)
         self.anim_speed_slider: QtWidgets.QSlider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
         self.anim_speed_slider.setMinimum(AnimSpeedPicker.__MIN_VAL)
         self.anim_speed_slider.setMaximum(AnimSpeedPicker.__MAX_VAL)
+        self.anim_speed_slider.setMaximumWidth(250)
+        self.anim_speed_slider.setFixedHeight(30)
         assert AnimSpeedPicker.__MIN_VAL <= self.settings.SETTINGS[self.settings_key] <= AnimSpeedPicker.__MAX_VAL
         self.set_state()
         self.anim_speed_slider.setTickInterval(AnimSpeedPicker.__TICK_INTERVAL)
@@ -88,6 +99,8 @@ class AnimSpeedPicker(QtWidgets.QVBoxLayout):
         self.addWidget(self.anim_speed_slider)
         self.anim_speed_indicator: QtWidgets.QLabel = QtWidgets.QLabel(f"{self.anim_speed_slider.value()}x")
         self.addWidget(self.anim_speed_indicator)
+        self.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        self.setContentsMargins(10, 6, 10, 5)
 
     def update_anim_speed(self, new_value: int):
         self.settings.SETTINGS[self.settings_key] = new_value
