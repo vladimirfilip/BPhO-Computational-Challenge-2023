@@ -61,9 +61,13 @@ class OrbitsPage(QtWidgets.QWidget):
         toolbar = NavigationToolbar(self.figure_canvas, self)
         graph_layout.addWidget(toolbar)
         graph_layout.addWidget(self.figure_canvas)
+        settings_btn_layout = QtWidgets.QHBoxLayout()
+        settings_btn_layout.addStretch()
         settings_button = QtWidgets.QPushButton("Settings")
         settings_button.clicked.connect(self.on_settings_button_click)
-        graph_layout.addWidget(settings_button)
+        settings_btn_layout.addWidget(settings_button)
+        settings_btn_layout.addStretch()
+        graph_layout.addLayout(settings_btn_layout)
         root_layout.addLayout(graph_layout)
         #
         # Creating layout and widgets for user to pick planet to see orbit stats on
@@ -154,11 +158,11 @@ class OrbitsPageSettings(QtWidgets.QWidget):
 
     def init_settings_widgets(self):
         top_half = QtWidgets.QHBoxLayout()
+        top_half.addStretch()
         centre_of_orbit_picker = CentreOfOrbitPicker(self.settings)
         centre_of_orbit_picker.setContentsMargins(5, 5, 5, 5)
         self.child_widgets.append(centre_of_orbit_picker)
         top_half.addLayout(centre_of_orbit_picker)
-        top_half.setStretchFactor(centre_of_orbit_picker, 1)
         objects_to_show_layout = QtWidgets.QVBoxLayout()
         objects_to_show_layout.addWidget(QtWidgets.QLabel("Objects to show"))
         for i in range(len(OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS)):
@@ -171,7 +175,7 @@ class OrbitsPageSettings(QtWidgets.QWidget):
         anim_speed_picker = AnimSpeedPicker(self.settings)
         self.child_widgets.append(anim_speed_picker)
         top_half.addLayout(anim_speed_picker)
-        top_half.setStretchFactor(anim_speed_picker, 1)
+        top_half.addStretch()
         self.controls_layout.addLayout(top_half)
         bottom_half = QtWidgets.QHBoxLayout()
         view_type_picker = ViewTypePicker(self.settings)

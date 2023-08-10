@@ -89,7 +89,7 @@ class AnimSpeedPicker(QtWidgets.QVBoxLayout):
         self.anim_speed_slider: QtWidgets.QSlider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
         self.anim_speed_slider.setMinimum(AnimSpeedPicker.__MIN_VAL)
         self.anim_speed_slider.setMaximum(AnimSpeedPicker.__MAX_VAL)
-        self.anim_speed_slider.setMaximumWidth(250)
+        self.anim_speed_slider.setFixedWidth(150)
         self.anim_speed_slider.setFixedHeight(30)
         assert AnimSpeedPicker.__MIN_VAL <= self.settings.SETTINGS[self.settings_key] <= AnimSpeedPicker.__MAX_VAL
         self.set_state()
