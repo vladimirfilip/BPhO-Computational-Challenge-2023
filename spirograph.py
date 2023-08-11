@@ -29,3 +29,4 @@ class IntPicker(QtWidgets.QVBoxLayout):
         self.line_edit = QtWidgets.QLineEdit()
         self.line_edit.setValidator(QtGui.QIntValidator())
         self.addWidget(self.line_edit)
+
