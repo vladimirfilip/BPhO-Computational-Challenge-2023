@@ -51,7 +51,7 @@ class Animation3D:
 
         # Generates points for orbital path of every planet at regular intervals in orbital angle
         if self._centre != Planet.SUN.name:
-            angle_centre = InclinationAngle[self._centre].value
+            angle_centre = float(InclinationAngle[self._centre].value)
             b_centre = SemiMinorAxis[self._centre].value
             e_centre = Eccentricity[self._centre].value
             r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta))
@@ -61,7 +61,7 @@ class Animation3D:
             self._centre_line_vals = (x_centre, y_centre, z_centre)
 
         for planet in self._planets:
-            angle = InclinationAngle[planet].value
+            angle = float(InclinationAngle[planet].value)
             b = SemiMinorAxis[planet].value
             e = Eccentricity[planet].value
             r = float(b) / (1 - float(e) * np.cos(theta))
@@ -76,7 +76,7 @@ class Animation3D:
 
     def calculate_anim_vals(self):
         periods = [OrbitalPeriod[planet].value for planet in self._planets]
-        max_period = max(periods)
+        max_period = float(max(periods))
 
         # Calculates total number of frames that will make up animation
         self._num_frames = round((self._orbit_duration * 1000) / Animation3D.FRAME_DURATION)
@@ -85,7 +85,7 @@ class Animation3D:
         if self._centre != Planet.SUN.name:
             # Calculates orbital angles at corresponding poins in time
             theta_vals = (2 * math.pi * time_vals) / float(OrbitalPeriod[self._centre].value)
-            angle_centre = InclinationAngle[self._centre].value
+            angle_centre = float(InclinationAngle[self._centre].value)
             b_centre = SemiMinorAxis[self._centre].value
             e_centre = Eccentricity[self._centre].value
             r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta_vals))
@@ -96,7 +96,7 @@ class Animation3D:
 
         for planet in self._planets:
             theta_vals = (2 * math.pi * time_vals) / float(OrbitalPeriod[planet].value)
-            angle = InclinationAngle[planet].value
+            angle = float(InclinationAngle[planet].value)
             b = SemiMinorAxis[planet].value
             e = Eccentricity[planet].value
             r = float(b) / (1 - float(e) * np.cos(theta_vals))
@@ -118,7 +118,8 @@ class Animation3D:
             current_x = self._anim_data[current_planet][0][i]
             current_y = self._anim_data[current_planet][1][i]
             current_z = self._anim_data[current_planet][2][i]
-            self._anims[j].set_data([current_x], [current_y], [current_z])
+            self._anims[j].set_data([[current_x], [current_y], [current_z]])
+            self._anims[j].set_3d_properties([[current_x], [current_y], [current_z]])
         return self._lines + self._anims
 
     def create_animation(self):
@@ -142,3 +143,6 @@ class Animation3D:
                             init_func=self.init_func)
         plt.show()
         ani.save("3d_animation.gif", fps=25)
+
+if __name__ == "__main__":
+    Animation3D(["MERCURY", "VENUS", "EARTH", "MARS"], "SUN", 2)
