@@ -41,16 +41,16 @@ class Mass(Enum):
 # Scalar
 #
 class Eccentricity(Enum):
-    SUN = 0
-    MERCURY = 0.21
-    VENUS = 0.01
-    EARTH = 0.02
-    MARS = 0.09
-    JUPITER = 0.05
-    SATURN = 0.06
-    URANUS = 0.05
-    NEPTUNE = 0.01
-    PLUTO = 0.25
+    SUN = Decimal(0)
+    MERCURY = Decimal(0.21)
+    VENUS = Decimal(0.01)
+    EARTH = Decimal(0.02)
+    MARS = Decimal(0.09)
+    JUPITER = Decimal(0.05)
+    SATURN = Decimal(0.06)
+    URANUS = Decimal(0.05)
+    NEPTUNE = Decimal(0.01)
+    PLUTO = Decimal(0.25)
 
 
 #
@@ -101,6 +101,19 @@ class OrbitalPeriod(Enum):
     PLUTO = Decimal(248.348)
 
 
+class InclinationAngle(Enum):
+    MERCURY = Decimal(7)
+    VENUS = Decimal(3.39)
+    EARTH = Decimal(0)
+    MARS = Decimal(1.85)
+    JUPITER = Decimal(1.31)
+    SATURN = Decimal(2.49)
+    URANUS = Decimal(0.77)
+    NEPTUNE = Decimal(1.77)
+    PLUTO = Decimal(17.5)
+
+
 class GlobalConstants(Enum):
-    FRAME_RATE = 60
+    FRAME_RATE = 47
+    FRAME_INTERVAL = 40
     G_CONSTANT = Decimal(6.67) * Decimal(10) ** Decimal(-11)
