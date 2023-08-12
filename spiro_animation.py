@@ -128,7 +128,7 @@ class SpiroAnimation:
         self._anim_2.set_data([self._anim_data_2[0][i]], [self._anim_data_2[1][i]])
         self._lines[i].set_data(self._spiro_data[i][0], self._spiro_data[i][1])
         if self.post_draw_callback:
-            self.post_draw_callback(i // SpiroAnimation.LINES_PER_ORBIT, i * self._time_diff)
+            self.post_draw_callback(i // SpiroAnimation.LINES_PER_ORBIT, i)
         return self._lines + [self._anim_1, self._anim_2, self._orbit_1, self._orbit_2]
 
     def create_animation(self):

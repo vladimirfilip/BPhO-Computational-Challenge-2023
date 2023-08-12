@@ -74,7 +74,6 @@ class OrbitsPage(QtWidgets.QWidget):
             default_val="Earth",
             choices=PLANETS,
             tooltip="Choose the name of the planet to see orbit stats on",
-            on_change=self.on_planet_dropdown_changed,
             fixed_lbl_width=50,
             fixed_form_width=150
         )
@@ -108,18 +107,10 @@ class OrbitsPage(QtWidgets.QWidget):
         #
         self.setLayout(root_layout)
 
-    def on_planet_dropdown_changed(self, new_index: int):
-        new_planet: str = self.planet_picker_layout.choices[new_index]
-        print("NEW PLANET: ", new_planet)
-        # TODO: add binding to engine to set new stats on the new planet
-        pass
-
     def on_settings_button_click(self):
         self.parent.switch_to(PageIndexes.ORBITS_PAGE_SETTINGS.value)
 
     def update_graph(self):
-        print("NEW SETTINGS")
-        print(self.sim_settings.SETTINGS)
         # Called when simulation settings have been updated
         self.planet_picker_layout.set_choices(self.sim_settings.SETTINGS[SettingsKeys.OBJECTS_TO_SHOW.value], 0)
         self.display_animation()
@@ -388,10 +379,10 @@ class SpirographPage(QtWidgets.QWidget):
             lbl_text="Speed: ",
             tooltip="The speed at which a new line is drawn",
             choices=["slow", "medium", "fast"],
-            default_val="medium",
+            default_val="fast",
             fixed_form_width=75,
             fixed_lbl_width=45,
-            fixed_height=20,
+            fixed_height=25,
             padding=[5, 5, 5, 5])
         self.n_orbits: HorizontalValuePicker = HorizontalValuePicker(
             value_type=int,
@@ -400,7 +391,7 @@ class SpirographPage(QtWidgets.QWidget):
             default_val=10,
             fixed_form_width=100,
             fixed_lbl_width=20,
-            fixed_height=20)
+            fixed_height=25)
         param_picker_layout = QtWidgets.QVBoxLayout()
         planet_picker_layout = QtWidgets.QHBoxLayout()
         planet_picker_layout.addLayout(self.planet1picker)
@@ -438,7 +429,7 @@ class SpirographPage(QtWidgets.QWidget):
                                             fixed_value_height=50,
                                             fixed_width=120,
                                             alignment=QtCore.Qt.AlignmentFlag.AlignTop)
-        self.elapsed_time = ValueViewer("Elapsed time",
+        self.elapsed_time = ValueViewer("# of lines",
                                         fixed_key_height=20,
                                         fixed_value_height=50,
                                         fixed_width=120,
@@ -463,7 +454,6 @@ class SpirographPage(QtWidgets.QWidget):
         planet2: str = star_system_class.Planet(self.planet2picker.get_value()).name
         speed: str = self.speed_picker.get_value()
         N: int = int(self.n_orbits.get_value())
-        print(planet1, planet2, N, speed)
         if self.anim:
             self.anim.ani.event_source.stop()
         self.graph_layout.removeWidget(self.canvas)
@@ -486,9 +476,9 @@ class SpirographPage(QtWidgets.QWidget):
         self.planet1picker.set_choices([e.value for e in star_system_class.Planet if e.name != sun_name], 0)
         self.planet2picker.set_choices([e.value for e in star_system_class.Planet if e.name != sun_name], 1)
 
-    def refresh_labels(self, n_orbits, time_passed):
+    def refresh_labels(self, n_orbits, lines):
         self.completed_orbits.set_text(n_orbits)
-        self.elapsed_time.set_text(f"{time_passed} s")
+        self.elapsed_time.set_text(lines)
 
 
 class PageClasses(Enum):

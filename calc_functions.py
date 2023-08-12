@@ -4,8 +4,6 @@ from constants import Constants
 class CalcFunctions:
     @staticmethod
     def orbital_vals_2d(theta_vals, planet: str, solar_system: str):
-        print([e.name for e in Constants.__dict__[solar_system].SemiMinorAxis])
-        print(Constants.__dict__[solar_system].SemiMinorAxis)
         b = float(Constants.__dict__[solar_system].SemiMinorAxis[planet].value)
         e = float(Constants.__dict__[solar_system].Eccentricity[planet].value)
         r = b / (1 - e * np.cos(theta_vals))
