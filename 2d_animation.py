@@ -4,14 +4,22 @@ from matplotlib.animation import FuncAnimation
 from solar_system_constants import *
 import numpy as np
 import math
+from constants import Constants
+from calc_functions import CalcFunctions
 
 matplotlib.use('TkAgg')
 
 
 class Animation2D:
-    FRAME_DURATION = 40
+    FRAME_DURATION = 20
 
-    def __init__(self, planets: list[str], centre: str, orbit_duration: float):
+    def __init__(self, solar_system: str, planets: list[str], centre: str, orbit_duration: float, num_orbits: int):
+        self._solar_system = solar_system
+        self.constants = Constants.__dict__[self._solar_system]
+
+        # Total number of orbits of outermost planet
+        self._num_orbits = num_orbits
+
         # Planets to show in animation
         self._planets = planets
 
@@ -47,61 +55,47 @@ class Animation2D:
         self.create_animation()
 
     def calculate_line_vals(self):
-        periods = [OrbitalPeriod[planet].value for planet in self._planets]
-        max_period = float(max(periods))
-
+        periods = [float(self.constants.OrbitalPeriod[planet].value) for planet in self._planets]
+        max_period = max(periods)
         # Calculates total number of frames that will make up animation
-        time = np.linspace(0, max_period, 150)
-        theta = (2 * math.pi * time) / float(OrbitalPeriod[self._centre].value)
+        time_vals = np.linspace(0, max_period * self._num_orbits, 1000)
 
         # Generates points for orbital path of every planet at regular intervals in orbital angle
-        if self._centre != Planet.SUN.name:
-            print("ok")
-            b_centre = SemiMinorAxis[self._centre].value
-            e_centre = Eccentricity[self._centre].value
-            r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta))
-            x_centre = r_centre * np.cos(theta)
-            y_centre = r_centre * np.sin(theta)
-            self._centre_line_vals = (x_centre, y_centre)
+        if self._centre != self.constants.SUN:
+            theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[self._centre].value)
+            self._centre_line_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta,
+                                                                   planet=self._centre,
+                                                                   solar_system=self._solar_system)
 
         for planet in self._planets:
-            time_vals = np.linspace(0, max_period, 150)
-            theta = (2 * math.pi * time_vals) / float(OrbitalPeriod[planet].value)
-            b = SemiMinorAxis[planet].value
-            e = Eccentricity[planet].value
-            r = float(b) / (1 - float(e) * np.cos(theta))
-            x = r * np.cos(theta)
-            y = r * np.sin(theta)
-
+            theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+            x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta, planet=planet,
+                                                           solar_system=self._solar_system)
             # Subtracts coordinates of reference planet at each corresponding orbital angle
-            self._line_data[planet] = (x - self._centre_line_vals[0], y - self._centre_line_vals[1])
+            self._line_data[planet] = (x_vals - self._centre_line_vals[0], y_vals - self._centre_line_vals[1])
+        print(self._line_data)
 
     def calculate_anim_vals(self):
-        periods = [OrbitalPeriod[planet].value for planet in self._planets]
-        max_period = float(max(periods))
+        periods = [float(self.constants.OrbitalPeriod[planet].value) for planet in self._planets]
+        max_period = max(periods)
 
         # Calculates total number of frames that will make up animation
-        self._num_frames = round((self._orbit_duration * 1000) / Animation2D.FRAME_DURATION)
-        time_vals = np.linspace(0, max_period, self._num_frames)
+        self._num_frames = round((self._orbit_duration * self._num_orbits * 1000) / Animation2D.FRAME_DURATION)
+        time_vals = np.linspace(0, max_period * self._num_orbits, self._num_frames)
 
-        if self._centre != Planet.SUN.name:
+        if self._centre != self.constants.SUN:
             # Calculates orbital angles at corresponding poins in time
-            theta_vals = (2 * math.pi * time_vals) / float(OrbitalPeriod[self._centre].value)
-            b_centre = SemiMinorAxis[self._centre].value
-            e_centre = Eccentricity[self._centre].value
-            r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta_vals))
-            x_centre = r_centre * np.cos(theta_vals)
-            y_centre = r_centre * np.sin(theta_vals)
-            self._centre_anim_vals = (x_centre, y_centre)
+            theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[self._centre].value)
+            self._centre_anim_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta_vals,
+                                                                   planet=self._centre,
+                                                                   solar_system=self._solar_system)
 
         for planet in self._planets:
-            theta_vals = (2 * math.pi * time_vals) / float(OrbitalPeriod[planet].value)
-            b = SemiMinorAxis[planet].value
-            e = Eccentricity[planet].value
-            r = float(b) / (1 - float(e) * np.cos(theta_vals))
-            x = r * np.cos(theta_vals)
-            y = r * np.sin(theta_vals)
-            self._anim_data[planet] = (x - self._centre_anim_vals[0], y - self._centre_anim_vals[1])
+            theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+            x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta_vals,
+                                                           planet=planet,
+                                                           solar_system=self._solar_system)
+            self._anim_data[planet] = (x_vals - self._centre_anim_vals[0], y_vals - self._centre_anim_vals[1])
 
     def init_func(self):
         for line in self._anims:
@@ -130,7 +124,8 @@ class Animation2D:
                             blit=True,
                             init_func=self.init_func)
         plt.show()
-        ani.save("2d_animation.gif", fps=25)
+        # ani.save("2d_animation.gif", fps=25)
+
 
 if __name__ == "__main__":
-    Animation2D(["SATURN", "JUPITER", "NEPTUNE", "URANUS"], "PLUTO", 2)
+    Animation2D("TAU_CETI", ["g", "h", "e", "f"], "e", 3, 2)
