@@ -2,9 +2,10 @@ from typing import Callable, Optional
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
-
-PLANETS: list[str] = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
-
+from tau_ceti_constants import TauCeti
+from proxima_centauri_constants import ProximaCentauri
+from solar_system_constants import SolarSystem
+from HD_219134_constants import HD219134
 
 class SettingsBtnLayout(QtWidgets.QHBoxLayout):
     def __init__(self, on_click: Callable, btn_width: Optional[int] = None, btn_height: Optional[int] = None, *args, **kwargs):
@@ -21,10 +22,12 @@ class SettingsBtnLayout(QtWidgets.QHBoxLayout):
 
 
 class SettingsKeys(Enum):
+    STAR_SYSTEM = "Star system"
     CENTRE_OF_ORBIT = "Centre of orbit"
     OBJECTS_TO_SHOW = "Objects to show"
     ORBIT_TIME = "Orbit time"
     VIEW_TYPE = "View type"
+    NUM_ORBITS = "Number of orbits"
 
 
 class ViewType(Enum):
@@ -32,19 +35,38 @@ class ViewType(Enum):
     THREE_D = "3D"
 
 
+class StarSystem(Enum):
+    SOLAR_SYSTEM = "Solar System"
+    TAU_CETI = "Tau Ceti"
+    PROXIMA_CENTAURI = "Proxima Centauri"
+    HD_219134 = "HD 219134"
+
+
+DEFAULT_STAR_SYSTEM = StarSystem.SOLAR_SYSTEM
+
+solar_system_enum_to_class: dict = {
+    StarSystem.SOLAR_SYSTEM: SolarSystem,
+    StarSystem.TAU_CETI: TauCeti,
+    StarSystem.PROXIMA_CENTAURI: ProximaCentauri,
+    StarSystem.HD_219134: HD219134,
+}
+
+
 class OrbitSimSettings:
     SETTINGS: dict = {
-        SettingsKeys.CENTRE_OF_ORBIT.value: "Sun",
-        SettingsKeys.OBJECTS_TO_SHOW.value: ["Sun"] + PLANETS,
+        SettingsKeys.STAR_SYSTEM.value: DEFAULT_STAR_SYSTEM,
+        SettingsKeys.CENTRE_OF_ORBIT.value: solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].Planet[solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].SUN].value,
+        SettingsKeys.OBJECTS_TO_SHOW.value: [e.value for e in solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].Planet if e.name != "SUN"],
         SettingsKeys.ORBIT_TIME.value: 1,
-        SettingsKeys.VIEW_TYPE.value: ViewType.TWO_D.value
+        SettingsKeys.VIEW_TYPE.value: ViewType.TWO_D.value,
+        SettingsKeys.NUM_ORBITS.value: 1,
     }
 
 
 class CheckBox(QtWidgets.QCheckBox):
     def __init__(self, on_change: Optional[Callable] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.toggled.connect(lambda : on_change(self))
+        self.toggled.connect(on_change)
 
 
 class ViewTypePicker(QtWidgets.QVBoxLayout):
@@ -129,6 +151,7 @@ class HorizontalValuePicker(QtWidgets.QHBoxLayout):
                  fixed_lbl_width: Optional[int] = None, fixed_form_width: Optional[int] = None,
                  fixed_height: Optional[int] = None, padding: Optional[list[int]] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.value_type = value_type
         self.label = QtWidgets.QLabel(lbl_text)
         self.label.setStyleSheet("font-weight: bold;")
         if tooltip:
@@ -178,6 +201,14 @@ class HorizontalValuePicker(QtWidgets.QHBoxLayout):
             return self.form.text()
         raise TypeError("cannot handle form of type {}".format(type(self.form)))
 
+    def set_choices(self, choices: list, index: int):
+        if self.value_type == "from_multiple":
+            self.removeWidget(self.form)
+            self.form.clear()
+            self.form.addItems(choices)
+            self.form.setCurrentIndex(index)
+            self.addWidget(self.form)
+
 
 class VerticalValuePicker(QtWidgets.QVBoxLayout):
     def __init__(self, value_type: type | str, lbl_text: str, default_val=None, choices: Optional[list] = None,
@@ -188,6 +219,7 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
         self.value_type = value_type
         self.label = QtWidgets.QLabel(lbl_text)
         self.label.setStyleSheet("font-weight: bold;")
+        self.on_change = on_change
         if tooltip:
             self.label.setToolTip(tooltip)
         if fixed_lbl_height:
@@ -217,20 +249,20 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
             self.form = self.dropdown
         elif value_type == "many_from_multiple":
             self.choices = choices
-            checkboxes = []
+            self.checkboxes = []
             for choice in choices:
-                checkbox = CheckBox(on_change,
+                checkbox = CheckBox(lambda : on_change(self.checkboxes),
                                     choice)
                 self.addWidget(checkbox)
-                checkboxes.append(checkbox)
-            self.form = checkboxes
+                self.checkboxes.append(checkbox)
+            self.form = self.checkboxes
         else:
             raise TypeError("invalid value type for ValuePicker")
         if fixed_form_height:
             self.form.setFixedHeight(fixed_form_height)
         if fixed_width:
             self.label.setFixedWidth(fixed_width)
-            self.form.setFixedHeight(fixed_width)
+            self.form.setFixedWidth(fixed_width)
         if padding:
             self.setContentsMargins(*padding)
         if type(self.form) != list and self.form is not None:
@@ -243,14 +275,31 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
             return self.form.text()
         raise TypeError("cannot handle form of type {}".format(type(self.form)))
 
-    def set_choices(self, choices: list, current_index: int):
-        self.form.clear()
-        self.form.addItems(choices)
-        self.form.setCurrentIndex(current_index)
+    def set_choices(self, choices: list, current_index: int = 0, check_all: bool = False):
+        if self.value_type == "from_multiple":
+            self.choices = []
+            self.form.clear()
+            self.form.addItems(choices)
+            self.choices = choices
+            self.form.setCurrentIndex(current_index)
+        elif self.value_type == "many_from_multiple":
+            while len(self.checkboxes) > len(choices):
+                self.removeWidget(self.checkboxes.pop())
+            while len(self.checkboxes) < len(choices):
+                self.checkboxes.append(CheckBox(
+                    lambda : self.on_change(self.checkboxes),
+                    ""
+                ))
+                self.addWidget(self.checkboxes[-1])
+            for i, choice in enumerate(choices):
+                self.checkboxes[i].setText(choice)
+                if check_all:
+                    self.checkboxes[i].setChecked(True)
+
 
     def set_value(self, new_value):
         if self.value_type in [int, float, str]:
-            self.form.setText(new_value)
+            self.form.setText(str(new_value))
         elif self.value_type == "from_multiple":
             assert new_value in self.choices, "new value must be from choices available in the dropdown"
             self.form.setCurrentIndex(self.choices.index(new_value))

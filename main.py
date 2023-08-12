@@ -1,27 +1,8 @@
 from typing import Callable
 
-from PyQt6 import QtCore, QtGui, QtWidgets
-from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg, NavigationToolbar2QT as NavigationToolbar
-from matplotlib.figure import Figure
+from PyQt6 import QtWidgets
 from pages import OrbitsPage, SpirographPage, OrbitsPageSettings, PageClasses, PageIndexes
 import sys
-import matplotlib
-
-matplotlib.use('QtAgg')
-
-
-class FigureCanvas(FigureCanvasQTAgg):
-
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot()
-        super(FigureCanvas, self).__init__(fig)
-
-    def set_figure(self, figure: Figure):
-        self.axes = figure.add_subplot()
-
-    def plot(self, *args):
-        self.axes.plot(*args)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -36,26 +17,9 @@ class MainWindow(QtWidgets.QMainWindow):
             expected_class = PageClasses[PageIndexes(i).name].value
             assert expected_class == MainWindow.__TAB_DATA[i][0]
         super(MainWindow, self).__init__(*args, **kwargs)
-
-        # sc = MplCanvas(self, width=5, height=4, dpi=100)
-        # sc.axes.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
-        # #
-        # # Create toolbar, passing canvas as first parament, parent (self, the MainWindow) as second.
-        # #
-        # toolbar = NavigationToolbar(sc, self)
-        # layout = QtWidgets.QVBoxLayout()
-        # layout.addWidget(toolbar)
-        # layout.addWidget(sc)
-        # #
-        # # Create a placeholder widget to hold our toolbar and canvas.
-        # #
-        # widget = QtWidgets.QWidget()
-        # widget.setLayout(layout)
         tab_widget = QtWidgets.QTabWidget()
         self.central_widget = tab_widget
-        # tab_widget.addTab(widget, "Demo")
         self.set_tabs(tab_widget)
-        #tab_widget.setTabVisible(2, False)
         self.setCentralWidget(tab_widget)
         self.setStyleSheet(''' font-size: 14px; ''')
         self.show()

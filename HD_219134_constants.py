@@ -9,7 +9,7 @@ from decimal import Decimal
 class HD219134:
     SUN = "HD_219134"
 
-    class Planets(Enum):
+    class Planet(Enum):
         HD_219134 = "HD 219314"
         b = "HD 219314 b"
         c = "HD 219314 c"
@@ -17,6 +17,15 @@ class HD219134:
         d = "HD 219314 d"
         g = "HD 219314 g"
         h = "HD 219314 h"
+
+    class Mass(Enum):
+        HD_219134 = Decimal('0.75') * Decimal('333030')
+        b = Decimal('4.74')
+        c = Decimal('4.36')
+        d = Decimal('16.170')
+        f = Decimal('7.3')
+        g = Decimal('10.80622')
+        h = Decimal('0.34') * Decimal('317.907')
 
     class Eccentricity(Enum):
         b = Decimal('0')

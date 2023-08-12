@@ -74,7 +74,6 @@ class Animation2D:
 
             # Subtracts coordinates of reference planet at each corresponding orbital angle
             self._line_data[planet] = (x_vals - self._centre_line_vals[0], y_vals - self._centre_line_vals[1])
-        print(self._line_data)
 
     def calculate_anim_vals(self):
         periods = [float(self.constants.OrbitalPeriod[planet].value) for planet in self._planets]
@@ -115,8 +114,6 @@ class Animation2D:
         # Initialises line objects for orbital paths and points
         for planet in self._planets:
             self._anims.append(self._ax.plot([], [], "ro")[0])
-            print("x data")
-            print(self._line_data[planet][0])
             self._lines.append(self._ax.plot(self._anim_data[planet][0], self._anim_data[planet][1], lw=3)[0])
 
         self.ani = FuncAnimation(self._fig,

@@ -21,10 +21,10 @@ class SolarSystem:
         SATURN = "Saturn"
         URANUS = "Uranus"
         NEPTUNE = "Neptune"
-        PLUTO = "PLUTO"
+        PLUTO = "Pluto"
 
     #
-    # Measured in kg
+    # Measured in earth masses
     #
     class Mass(Enum):
         SUN = Decimal('332837')

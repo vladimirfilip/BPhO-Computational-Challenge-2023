@@ -5,14 +5,23 @@ from enum import Enum
 #
 from decimal import Decimal
 
+
 class TauCeti:
     SUN = "TAU_CETI"
+
     class Planet(Enum):
         TAU_CETI = "Tau Ceti"
         g = "Tau Ceti g"
         h = "Tau Ceti h"
         e = "Tau Ceti e"
         f = "Tau Ceti f"
+
+    class Mass(Enum):
+        g = Decimal('1.75')
+        h = Decimal('1.83')
+        e = Decimal('3.93')
+        f = Decimal('3.93')
+
 
     class Eccentricity(Enum):
         TAU_CETI = Decimal('0')
