@@ -47,10 +47,16 @@ class Animation2D:
         self.create_animation()
 
     def calculate_line_vals(self):
-        theta = np.linspace(0, 2 * math.pi, 100)
+        periods = [OrbitalPeriod[planet].value for planet in self._planets]
+        max_period = float(max(periods))
+
+        # Calculates total number of frames that will make up animation
+        time = np.linspace(0, max_period, 150)
+        theta = (2 * math.pi * time) / float(OrbitalPeriod[self._centre].value)
 
         # Generates points for orbital path of every planet at regular intervals in orbital angle
         if self._centre != Planet.SUN.name:
+            print("ok")
             b_centre = SemiMinorAxis[self._centre].value
             e_centre = Eccentricity[self._centre].value
             r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta))
@@ -61,6 +67,8 @@ class Animation2D:
             self._centre_line_vals = (x_centre, y_centre)
 
         for planet in self._planets:
+            time_vals = np.linspace(0, max_period, 150)
+            theta = (2 * math.pi * time_vals) / float(OrbitalPeriod[planet].value)
             b = SemiMinorAxis[planet].value
             e = Eccentricity[planet].value
             r = float(b) / (1 - float(e) * np.cos(theta))
