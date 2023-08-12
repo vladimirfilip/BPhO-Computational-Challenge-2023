@@ -18,7 +18,7 @@ class Planet(Enum):
     SATURN = "Saturn"
     URANUS = "Uranus"
     NEPTUNE = "Neptune"
-    PLUTO = "PLUTO"
+    PLUTO = "Pluto"
 
 
 #
