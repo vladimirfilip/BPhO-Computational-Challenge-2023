@@ -15,7 +15,7 @@ class ProximaCentauri:
         b = "Proxima Centauri b"
 
     class Mass(Enum):
-        PROXIMA_CENTAURI = Decimal('0')
+        PROXIMA_CENTAURI = Decimal('0.1221') * Decimal('333030')
         d = Decimal('0.26')
         b = Decimal('1.07')
 

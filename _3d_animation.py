@@ -1,3 +1,5 @@
+from typing import Optional, Callable
+
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -14,7 +16,9 @@ class Animation3D:
     FRAME_DURATION = 20
     COLOURS = ["black", "orange", "green", "blue", "darkviolet", "cyan", "lime", "pink", "indigo"]
 
-    def __init__(self, fig, solar_system: str, planets: list[str], centre: str, orbit_duration: float, num_orbits: int):
+    def __init__(self, fig, solar_system: str, planets: list[str], centre: str, orbit_duration: float, num_orbits: int,
+                 post_draw_callback: Optional[Callable] = None):
+        self.post_draw_callback = post_draw_callback
         self._solar_system = solar_system
         self.constants = Constants.__dict__[self._solar_system]
 
@@ -38,6 +42,9 @@ class Animation3D:
 
         # Point data for obital path
         self._anim_data = {}
+
+        # Orbital angle values
+        self._theta_vals = {planet: [] for planet in self._planets}
 
         # Name of planet at centre of animation
         self._centre = centre
@@ -104,6 +111,7 @@ class Animation3D:
 
         for planet in self._planets:
             theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+            self._theta_vals[planet] += list(theta_vals)
             x_vals, y_vals, z_vals = CalcFunctions.orbital_vals_3d(theta_vals=theta_vals,
                                                                    planet=planet,
                                                                    solar_system=self._solar_system)
@@ -136,14 +144,17 @@ class Animation3D:
         return self._lines + self._anims
 
     def animate(self, i):
-        for j in range(len(self._planets)):
-            current_planet = self._planets[j]
+        coords = []
+        for j, current_planet in enumerate(self._planets):
             current_x = self._anim_data[current_planet][0][i]
             current_y = self._anim_data[current_planet][1][i]
             current_z = self._anim_data[current_planet][2][i]
+            coords.append([current_x, current_y, current_z])
             self._anims[j].set_xdata([current_x])
             self._anims[j].set_ydata([current_y])
             self._anims[j].set_3d_properties([current_z])
+        if self.post_draw_callback:
+            self.post_draw_callback([self._theta_vals[planet][i] for planet in self._planets], coords)
         return self._lines + self._anims
 
     def create_animation(self):

@@ -1,3 +1,5 @@
+from typing import Callable, Optional
+
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -14,8 +16,10 @@ class Animation2D:
     FRAME_DURATION = 20
     COLOURS = ["black", "orange", "green", "blue", "darkviolet", "cyan", "lime", "pink", "indigo"]
 
-    def __init__(self, fig, solar_system: str, planets: list[str], centre: str, orbit_duration: float, num_orbits: int):
+    def __init__(self, fig, solar_system: str, planets: list[str], centre: str, orbit_duration: float, num_orbits: int,
+                 post_draw_callback: Optional[Callable] = None):
         self._solar_system = solar_system
+        self.post_draw_callback = post_draw_callback
         self.constants = Constants.__dict__[self._solar_system]
 
         # Total number of orbits of outermost planet
@@ -38,6 +42,9 @@ class Animation2D:
 
         # Point data for obital path
         self._anim_data = {}
+
+        # Orbital angle for every planet
+        self._theta_vals = {planet: [] for planet in self._planets}
 
         # Name of planet at centre of animation
         self._centre = centre
@@ -76,7 +83,6 @@ class Animation2D:
             self._centre_line_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta,
                                                                    planet=self._centre,
                                                                    solar_system=self._solar_system)
-
         for planet in self._planets:
             theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
             x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta, planet=planet,
@@ -112,6 +118,7 @@ class Animation2D:
 
         for planet in self._planets:
             theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+            self._theta_vals[planet] += list(theta_vals)
             x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta_vals,
                                                            planet=planet,
                                                            solar_system=self._solar_system)
@@ -123,11 +130,13 @@ class Animation2D:
         return self._lines + self._anims
 
     def animate(self, i):
-        for j in range(len(self._planets)):
-            current_planet = self._planets[j]
+        coords = []
+        for j, current_planet in enumerate(self._planets):
             current_x = self._anim_data[current_planet][0][i]
             current_y = self._anim_data[current_planet][1][i]
+            coords.append([current_x, current_y])
             self._anims[j].set_data([current_x], [current_y])
+        self.post_draw_callback([self._theta_vals[planet][i] for planet in self._planets], coords)
         return self._anims + self._lines
 
     def create_animation(self):

@@ -57,7 +57,7 @@ class OrbitSimSettings:
         SettingsKeys.STAR_SYSTEM.value: DEFAULT_STAR_SYSTEM,
         SettingsKeys.CENTRE_OF_ORBIT.value: solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].Planet[solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].SUN].value,
         SettingsKeys.OBJECTS_TO_SHOW.value: [e.value for e in solar_system_enum_to_class[DEFAULT_STAR_SYSTEM].Planet if e.name != "SUN"],
-        SettingsKeys.ORBIT_TIME.value: 1,
+        SettingsKeys.ORBIT_TIME.value: 5,
         SettingsKeys.VIEW_TYPE.value: ViewType.TWO_D.value,
         SettingsKeys.NUM_ORBITS.value: 1,
     }
@@ -168,7 +168,7 @@ class HorizontalValuePicker(QtWidgets.QHBoxLayout):
             if value_type == float:
                 self.line_edit.setValidator(QtGui.QDoubleValidator())
             if default_val:
-                self.line_edit.setText(default_val)
+                self.line_edit.setText(str(default_val))
             if on_change:
                 self.line_edit.textChanged.connect(on_change)
             self.form = self.line_edit
@@ -204,8 +204,9 @@ class HorizontalValuePicker(QtWidgets.QHBoxLayout):
     def set_choices(self, choices: list, index: int):
         if self.value_type == "from_multiple":
             self.removeWidget(self.form)
+            self.choices = choices
             self.form.clear()
-            self.form.addItems(choices)
+            self.form.addItems(self.choices)
             self.form.setCurrentIndex(index)
             self.addWidget(self.form)
 
@@ -337,4 +338,4 @@ class ValueViewer(QtWidgets.QVBoxLayout):
             self.setContentsMargins(*padding)
 
     def set_text(self, new_text: str):
-        self.label.setText(new_text if new_text else "-")
+        self.label.setText(str(new_text) if new_text else "-")

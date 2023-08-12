@@ -2,9 +2,12 @@ from typing import Optional
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
 
+from _decimal import Decimal
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from math import cos, sqrt, pi
+
 from _2d_animation import Animation2D
 from _3d_animation import Animation3D
 from components import OrbitSimSettings, ViewTypePicker, SettingsKeys, ViewType, SettingsBtnLayout, \
@@ -31,6 +34,7 @@ class OrbitsPage(QtWidgets.QWidget):
         "Angular velocity": None,
         "Linear velocity": None,
         "Distance from centre": None,
+        "Distance from star": None,
         "Orbital angle": None,
         "Eccentricity": None,
         "Semi-major axis": None,
@@ -84,9 +88,8 @@ class OrbitsPage(QtWidgets.QWidget):
             stats_component = ValueViewer(stat_name,
                                           stat_value,
                                           fixed_width=150,
-                                          fixed_key_height=20,
-                                          fixed_value_height=35,
                                           alignment=QtCore.Qt.AlignmentFlag.AlignTop)
+            stats_component.label.setWordWrap(True)
             self.stats_components.append(stats_component)
             stats_layout.addLayout(stats_component, i // 2, i % 2, 1, 1)
         #
@@ -106,7 +109,7 @@ class OrbitsPage(QtWidgets.QWidget):
         self.setLayout(root_layout)
 
     def on_planet_dropdown_changed(self, new_index: int):
-        new_planet: str = PLANETS[new_index]
+        new_planet: str = self.planet_picker_layout.choices[new_index]
         print("NEW PLANET: ", new_planet)
         # TODO: add binding to engine to set new stats on the new planet
         pass
@@ -146,12 +149,53 @@ class OrbitsPage(QtWidgets.QWidget):
         self.toolbar = NavigationToolbar(self.canvas, self)
         self.graph_layout.insertWidget(0, self.toolbar)
         self.graph_layout.insertWidget(1, self.canvas)
-        args = [self.fig, solar_system.name, planets, centre, orbit_duration, num_orbits]
-        print("ANIM PARAMS", args)
+        args = [self.fig, solar_system.name, planets, centre, orbit_duration, num_orbits, self.refresh_stats_labels]
         if settings[SettingsKeys.VIEW_TYPE.value] == ViewType.TWO_D.value:
             self.anim = Animation2D(*args)
         else:
-            self.anim = Animation3D(*args[:-1])
+            self.anim = Animation3D(*args)
+
+    def refresh_stats_labels(self, theta_angles: list[float], coords: list[list[float]]):
+        i = self.planet_picker_layout.form.currentIndex()
+        planet_name = self.planet_picker_layout.choices[i]
+        solar_system = self.sim_settings.SETTINGS[SettingsKeys.STAR_SYSTEM.value]
+        solar_system_class = solar_system_enum_to_class[solar_system]
+        try:
+            planet_enum_key = solar_system_class.Planet(planet_name).name
+        except ValueError:
+            # star system is being actively changed in settings, and so refreshing is paused until everything is synced
+            return
+        star_enum_key = solar_system_class.SUN
+        earth_mass = Decimal('5.972') * Decimal(Decimal('10') ** Decimal('24'))
+        au_in_metres = Decimal('1.496') * Decimal(Decimal('10') ** Decimal('11'))
+        G: Decimal = Decimal('6.67') * Decimal(Decimal('10') ** Decimal('-11'))
+        M: Decimal = solar_system_class.Mass[star_enum_key].value * earth_mass
+        e: Decimal = solar_system_class.Eccentricity[planet_enum_key].value
+        b: Decimal = solar_system_class.SemiMinorAxis[planet_enum_key].value * au_in_metres
+        a: Decimal = solar_system_class.SemiMajorAxis[planet_enum_key].value * au_in_metres
+        m: Decimal = solar_system_class.Mass[planet_enum_key].value * earth_mass
+        P: Decimal = solar_system_class.OrbitalPeriod[planet_enum_key].value
+        theta: float = theta_angles[i] % float(Decimal('2') * Decimal(pi))
+        coords: list[float] = coords[i]
+        r = b / (Decimal('1') - e * Decimal(cos(theta)))
+        v = sqrt(G * M * (Decimal('2') / r - Decimal('1') / a))
+        w = Decimal(v) / r
+        OrbitsPage.ORBITS_STATS = {
+            "Coordinates": ",\n".join([str(round(coord, 6)) + " a.u." for coord in coords]),
+            "Mass": f"{round(float(m), 6)} kg",
+            "Angular velocity": f"{round(w, 14)} m/s",
+            "Linear velocity": f"{round(v, 6)} m/s",
+            "Distance from centre": f"{round(sqrt(sum(n * n for n in coords)), 6)} a.u.",
+            "Distance from star": f"{round(float(r / au_in_metres), 6)} a.u.",
+            "Orbital angle": f"{round(theta, 6)} rad",
+            "Eccentricity": e,
+            "Semi-major axis": f"{round(a / au_in_metres, 6)} a.u.",
+            "Semi-minor axis": f"{round(b / au_in_metres, 6)} a.u.",
+            "Orbital period": f"{round(float(P), 6)} years",
+        }
+
+        for i, k in enumerate(OrbitsPage.ORBITS_STATS.keys()):
+            self.stats_components[i].set_text(OrbitsPage.ORBITS_STATS[k])
 
 
 class OrbitsPageSettings(QtWidgets.QWidget):
@@ -168,7 +212,7 @@ class OrbitsPageSettings(QtWidgets.QWidget):
             SettingsKeys.STAR_SYSTEM.value: StarSystem.SOLAR_SYSTEM,
             SettingsKeys.CENTRE_OF_ORBIT.value: solar_system_enum_to_class[StarSystem.SOLAR_SYSTEM].Planet[solar_system_enum_to_class[StarSystem.SOLAR_SYSTEM].SUN].value,
             SettingsKeys.OBJECTS_TO_SHOW.value: [e.value for e in solar_system_enum_to_class[StarSystem.SOLAR_SYSTEM].Planet if e.name != "SUN"],
-            SettingsKeys.ORBIT_TIME.value: 1,
+            SettingsKeys.ORBIT_TIME.value: 5,
             SettingsKeys.VIEW_TYPE.value: ViewType.TWO_D.value,
             SettingsKeys.NUM_ORBITS.value: 1,
         }
@@ -309,6 +353,7 @@ class OrbitsPageSettings(QtWidgets.QWidget):
 
 
 class SpirographPage(QtWidgets.QWidget):
+    STAR_SYSTEM_OPTIONS = [k.value for k in solar_system_enum_to_class.keys()]
     def __init__(self, parent):
         super().__init__()
         self.parent = parent
@@ -343,18 +388,19 @@ class SpirographPage(QtWidgets.QWidget):
             lbl_text="Speed: ",
             tooltip="The speed at which a new line is drawn",
             choices=["slow", "medium", "fast"],
+            default_val="medium",
             fixed_form_width=75,
-            fixed_lbl_width=20,
+            fixed_lbl_width=45,
             fixed_height=20,
             padding=[5, 5, 5, 5])
         self.n_orbits: HorizontalValuePicker = HorizontalValuePicker(
             value_type=int,
             lbl_text="N: ",
             tooltip="Number of orbits of the outermost planet",
+            default_val=10,
             fixed_form_width=100,
             fixed_lbl_width=20,
             fixed_height=20)
-
         param_picker_layout = QtWidgets.QVBoxLayout()
         planet_picker_layout = QtWidgets.QHBoxLayout()
         planet_picker_layout.addLayout(self.planet1picker)
@@ -366,6 +412,21 @@ class SpirographPage(QtWidgets.QWidget):
         param_picker_layout.addLayout(num_picker_layout)
         param_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addStretch()
+        star_system_layout = QtWidgets.QHBoxLayout()
+        star_system_layout.addStretch()
+        self.star_system_picker = HorizontalValuePicker(
+            value_type="from_multiple",
+            lbl_text="Star System: ",
+            default_val="Solar System",
+            choices=SpirographPage.STAR_SYSTEM_OPTIONS,
+            fixed_height=30,
+            fixed_lbl_width=90,
+            fixed_form_width=120,
+            on_change=self.on_star_system_changed
+        )
+        star_system_layout.addLayout(self.star_system_picker)
+        star_system_layout.addStretch()
+        controls_layout.addLayout(star_system_layout)
         controls_layout.addLayout(param_picker_layout)
         eval_button = QtWidgets.QPushButton("Evaluate")
         eval_button.pressed.connect(self.on_eval_button_press)
@@ -393,16 +454,16 @@ class SpirographPage(QtWidgets.QWidget):
         self.display_animation()
 
     def on_eval_button_press(self):
-        print(self.planet1picker.get_value().upper(),
-              self.planet2picker.get_value().upper(),
-              self.speed_picker.get_value(),
-              self.n_orbits.get_value())
+        self.display_animation()
 
     def display_animation(self):
-        planet1: str = self.planet1picker.get_value().upper()
-        planet2: str = self.planet2picker.get_value().upper()
+        star_system: StarSystem = StarSystem(self.star_system_picker.get_value())
+        star_system_class = solar_system_enum_to_class[star_system]
+        planet1: str = star_system_class.Planet(self.planet1picker.get_value()).name
+        planet2: str = star_system_class.Planet(self.planet2picker.get_value()).name
         speed: str = self.speed_picker.get_value()
-        N: int = int(self.speed_picker.get_value())
+        N: int = int(self.n_orbits.get_value())
+        print(planet1, planet2, N, speed)
         if self.anim:
             self.anim.ani.event_source.stop()
         self.graph_layout.removeWidget(self.canvas)
@@ -412,8 +473,22 @@ class SpirographPage(QtWidgets.QWidget):
         self.toolbar = NavigationToolbar(self.canvas, self)
         self.graph_layout.insertWidget(0, self.toolbar)
         self.graph_layout.insertWidget(1, self.canvas)
-        args = ["SOLAR_SYSTEM", "URANUS", "NEPTUNE", 10, "slow"]
+        args = [self.fig, star_system.name, planet1, planet2, N, speed, self.refresh_labels]
         self.anim = SpiroAnimation(*args)
+
+    def on_star_system_changed(self, new_index: int):
+        if new_index < 0:
+            return
+        new_star_system_str: str = SpirographPage.STAR_SYSTEM_OPTIONS[new_index]
+        new_star_system: StarSystem = StarSystem(new_star_system_str)
+        star_system_class = solar_system_enum_to_class[new_star_system]
+        sun_name: str = star_system_class.SUN
+        self.planet1picker.set_choices([e.value for e in star_system_class.Planet if e.name != sun_name], 0)
+        self.planet2picker.set_choices([e.value for e in star_system_class.Planet if e.name != sun_name], 1)
+
+    def refresh_labels(self, n_orbits, time_passed):
+        self.completed_orbits.set_text(n_orbits)
+        self.elapsed_time.set_text(f"{time_passed} s")
 
 
 class PageClasses(Enum):

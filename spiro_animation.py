@@ -1,3 +1,5 @@
+from typing import Callable, Optional
+
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -12,9 +14,11 @@ matplotlib.use('TkAgg')
 
 class SpiroAnimation:
     COLOURS = ["black", "red", "orange", "green", "blue", "darkviolet"]
+    LINES_PER_ORBIT: int = 70
 
-    def __init__(self, fig, solar_system: str, planet_1: str, planet_2: str, N: int, speed: str):
+    def __init__(self, fig, solar_system: str, planet_1: str, planet_2: str, N: int, speed: str, post_draw_callback: Optional[Callable] = None):
         self._solar_system = solar_system
+        self.post_draw_callback = post_draw_callback
         self._constants = Constants.__dict__[self._solar_system]
 
         self._planet_1 = planet_1
@@ -24,7 +28,7 @@ class SpiroAnimation:
         self._num_orbits = N
 
         # Total number of lines to show
-        self._num_lines = N * 70
+        self._num_lines = N * SpiroAnimation.LINES_PER_ORBIT
 
         # Endpoints of lines between planets
         self._spiro_data = []
@@ -123,6 +127,8 @@ class SpiroAnimation:
         self._anim_1.set_data([self._anim_data_1[0][i]], [self._anim_data_1[1][i]])
         self._anim_2.set_data([self._anim_data_2[0][i]], [self._anim_data_2[1][i]])
         self._lines[i].set_data(self._spiro_data[i][0], self._spiro_data[i][1])
+        if self.post_draw_callback:
+            self.post_draw_callback(i // SpiroAnimation.LINES_PER_ORBIT, i * self._time_diff)
         return self._lines + [self._anim_1, self._anim_2, self._orbit_1, self._orbit_2]
 
     def create_animation(self):
