@@ -9,7 +9,7 @@ from decimal import Decimal
 class HD219134:
     SUN = "HD_219134"
 
-    class Planets(Enum):
+    class Planet(Enum):
         HD_219134 = "HD 219314"
         b = "HD 219314 b"
         c = "HD 219314 c"

@@ -68,7 +68,7 @@ class OrbitsPage(QtWidgets.QWidget):
         #
         # Creating the graph canvas and the toolbar to manipulate it
         #
-        self.fig = Figure(figsize=(10, 10))
+        self.fig = Figure(figsize=(12, 12), dpi=100)
         self.canvas = FigureCanvas(self.fig)
         graph_layout = QtWidgets.QVBoxLayout()
         toolbar = NavigationToolbar(self.canvas, self)
@@ -79,7 +79,7 @@ class OrbitsPage(QtWidgets.QWidget):
                                                 btn_height=30)
         graph_layout.addLayout(settings_btn_layout)
         root_layout.addLayout(graph_layout)
-        self.anim = SpiroAnimation(self.fig, "SOLAR_SYSTEM", "VENUS", "EARTH", 10, 700, 0.1)
+        self.anim = Animation2D(self.fig, "PROXIMA_CENTAURI", ["d", "b"], "PROXIMA_CENTAURI", 3, 7)
         #
         # Creating layout and widgets for user to pick planet to see orbit stats on
         #

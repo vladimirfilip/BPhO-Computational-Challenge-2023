@@ -21,7 +21,7 @@ class SolarSystem:
         SATURN = "Saturn"
         URANUS = "Uranus"
         NEPTUNE = "Neptune"
-        PLUTO = "PLUTO"
+        PLUTO = "Pluto"
 
     #
     # Measured in kg
