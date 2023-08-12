@@ -2,10 +2,19 @@ from typing import Optional
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
 
-from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
+from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+import matplotlib
+import matplotlib.pyplot as plt
 
+from _3d_animation import Animation3D
+from spiro_animation import SpiroAnimation
+
+matplotlib.use('TkAgg')
+
+
+from _2d_animation import Animation2D
 from components import OrbitSimSettings, ViewTypePicker, \
     OrbitTimePicker, SettingsKeys, ViewType, SettingsBtnLayout, \
     HorizontalValuePicker, ValueViewer, VerticalValuePicker
@@ -19,18 +28,21 @@ class PageIndexes(Enum):
     SPIROGRAPH_PAGE = 2
 
 
-class FigureCanvas(FigureCanvasQTAgg):
-
-    def __init__(self, parent=None, width=5, height=4, dpi=100):
-        fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = fig.add_subplot()
-        super(FigureCanvas, self).__init__(fig)
-
-    def set_figure(self, figure: Figure):
-        self.axes = figure.add_subplot()
-
-    def plot(self, *args):
-        self.axes.plot(*args)
+# class FigureCanvas(FigureCanvasQTAgg):
+#
+#     def __init__(self, parent=None, width=5, height=4, dpi=100):
+#         self.fig = Figure(figsize=(10, 10))
+#         self.axes = fig.add_subplot()
+#         super(FigureCanvas, self).__init__(fig)
+#         self.ani = Animation2D("SOLAR_SYSTEM", ["MERCURY", "VENUS", "EARTH"], "SUN", 2.0, 1)
+#         self.ani = self.ani.create_animation(fig)
+#         self.draw()
+#
+#     def set_figure(self, figure: Figure):
+#         self.axes = figure.add_subplot()
+#
+#     def plot(self, *args):
+#         self.axes.plot(*args)
 
 
 class OrbitsPage(QtWidgets.QWidget):
@@ -56,17 +68,18 @@ class OrbitsPage(QtWidgets.QWidget):
         #
         # Creating the graph canvas and the toolbar to manipulate it
         #
-        self.figure_canvas = FigureCanvas(self)
-        self.figure_canvas.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        self.fig = Figure(figsize=(10, 10))
+        self.canvas = FigureCanvas(self.fig)
         graph_layout = QtWidgets.QVBoxLayout()
-        toolbar = NavigationToolbar(self.figure_canvas, self)
+        toolbar = NavigationToolbar(self.canvas, self)
         graph_layout.addWidget(toolbar)
-        graph_layout.addWidget(self.figure_canvas)
+        graph_layout.addWidget(self.canvas)
         settings_btn_layout = SettingsBtnLayout(on_click=self.on_settings_button_click,
                                                 btn_width=30,
                                                 btn_height=30)
         graph_layout.addLayout(settings_btn_layout)
         root_layout.addLayout(graph_layout)
+        self.anim = SpiroAnimation(self.fig, "SOLAR_SYSTEM", "VENUS", "EARTH", 10, 700, 0.1)
         #
         # Creating layout and widgets for user to pick planet to see orbit stats on
         #
@@ -249,12 +262,12 @@ class SpirographPage(QtWidgets.QWidget):
         self.setParent(parent)
         root_layout = QtWidgets.QHBoxLayout()
         self.sim_settings = OrbitSimSettings()
-        self.figure_canvas = FigureCanvas(self)
-        self.figure_canvas.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
+        # self.figure_canvas = FigureCanvas(self)
+        # self.figure_canvas.plot([0, 1, 2, 3, 4], [10, 1, 20, 3, 40])
         graph_layout = QtWidgets.QVBoxLayout()
-        toolbar = NavigationToolbar(self.figure_canvas, self)
-        graph_layout.addWidget(toolbar)
-        graph_layout.addWidget(self.figure_canvas)
+        # toolbar = NavigationToolbar(self.figure_canvas, self)
+        # graph_layout.addWidget(toolbar)
+        # graph_layout.addWidget(self.figure_canvas)
         root_layout.addLayout(graph_layout)
         controls_layout = QtWidgets.QVBoxLayout()
         self.planet1picker: HorizontalValuePicker = HorizontalValuePicker(

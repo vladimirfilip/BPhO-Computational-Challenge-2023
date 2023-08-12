@@ -10,7 +10,7 @@ matplotlib.use('TkAgg')
 
 
 class SpiroAnimation:
-    def __init__(self, solar_system: str, planet_1: str, planet_2: str, N: int, d, time_diff: float):
+    def __init__(self, fig, solar_system: str, planet_1: str, planet_2: str, N: int, d, time_diff: float):
         self._solar_system = solar_system
         self._constants = Constants.__dict__[self._solar_system]
 
@@ -31,8 +31,8 @@ class SpiroAnimation:
         # Difference in time between drawing of two consecutive lines
         self._time_diff = time_diff
 
-        self._fig = plt.figure(figsize=(10, 10))
-        self._ax = plt.axes()
+        self._fig: plt.Figure = fig
+        self._ax = self._fig.subplots()
         self._ax.set_xlim([-1, 1])
         self._ax.set_ylim([-1, 1])
 
@@ -71,9 +71,7 @@ class SpiroAnimation:
         #self._ax.plot(self._spiro_data[i][0], self._spiro_data[i][1], linewidth='0.5', color='black')
 
     def create_animation(self):
-        ani = FuncAnimation(self._fig, self.animate, frames=self._num_lines, interval=self._time_diff, repeat=True, blit=True, init_func=self.init_func)
-        plt.show()
-        ani.save("spirograph.png", fps=40)
+        self.ani = FuncAnimation(self._fig, self.animate, frames=self._num_lines, interval=self._time_diff, repeat=True, blit=True, init_func=self.init_func)
 
 if __name__ == "__main__":
     SpiroAnimation("TAU_CETI", "g", "h", 8, 700, 0.5)
