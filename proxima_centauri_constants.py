@@ -8,6 +8,7 @@ from decimal import Decimal
 
 class ProximaCentauri:
     SUN = "PROXIMA_CENTAURI"
+
     class Planet(Enum):
         PROXIMA_CENTAURI = "Proxima Centauri"
         d = "Proxima Centauri d"

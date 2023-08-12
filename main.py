@@ -57,6 +57,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.set_tabs(tab_widget)
         #tab_widget.setTabVisible(2, False)
         self.setCentralWidget(tab_widget)
+        self.setStyleSheet(''' font-size: 14px; ''')
         self.show()
 
     def set_tabs(self, tab_widget: QtWidgets.QTabWidget):

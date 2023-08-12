@@ -71,6 +71,7 @@ class Animation2D:
             theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
             x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta, planet=planet,
                                                            solar_system=self._solar_system)
+
             # Subtracts coordinates of reference planet at each corresponding orbital angle
             self._line_data[planet] = (x_vals - self._centre_line_vals[0], y_vals - self._centre_line_vals[1])
         print(self._line_data)
@@ -114,7 +115,9 @@ class Animation2D:
         # Initialises line objects for orbital paths and points
         for planet in self._planets:
             self._anims.append(self._ax.plot([], [], "ro")[0])
-            self._lines.append(self._ax.plot(self._line_data[planet][0], self._line_data[planet][1], lw=3)[0])
+            print("x data")
+            print(self._line_data[planet][0])
+            self._lines.append(self._ax.plot(self._anim_data[planet][0], self._anim_data[planet][1], lw=3)[0])
 
         ani = FuncAnimation(self._fig,
                             self.animate,
@@ -129,3 +132,4 @@ class Animation2D:
 
 if __name__ == "__main__":
     Animation2D("TAU_CETI", ["g", "h", "e", "f"], "e", 3, 2)
+

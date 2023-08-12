@@ -10,6 +10,7 @@ earth_mass: Decimal = Decimal(5.9742) * Decimal(10) ** Decimal(24)
 
 class SolarSystem:
     SUN = "SUN"
+
     class Planet(Enum):
         SUN = "Sun"
         MERCURY = "Mercury"
