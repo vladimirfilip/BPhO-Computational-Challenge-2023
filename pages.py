@@ -47,7 +47,7 @@ class OrbitsPage(QtWidgets.QWidget):
         #
         # Creating the graph canvas and the toolbar to manipulate it
         #
-        self.fig = Figure(figsize=(10, 10))
+        self.fig = Figure(figsize=(12, 12), dpi=100)
         self.canvas = FigureCanvas(self.fig)
         self.graph_layout = QtWidgets.QVBoxLayout()
         self.toolbar = NavigationToolbar(self.canvas, self)
