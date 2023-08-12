@@ -1,5 +1,4 @@
 from typing import Optional
-
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
 
@@ -7,10 +6,9 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from matplotlib.backends.backend_qt5agg import NavigationToolbar2QT as NavigationToolbar
 from matplotlib.figure import Figure
 
-from orbitsettings import OrbitSimSettings, ObjToShowCheckbox, CentreOfOrbitPicker, AnimSpeedPicker, ViewTypePicker, \
-    OrbitTimePicker, SettingsKeys, ViewType
-from spirograph import PlanetPicker, FloatPicker, IntPicker
-from core_components import ValueViewer
+from components import OrbitSimSettings, CentreOfOrbitPicker, AnimSpeedPicker, ViewTypePicker, \
+    OrbitTimePicker, SettingsKeys, ViewType, ObjToShowCheckboxGroup, SettingsBtnLayout, \
+    HorizontalValuePicker, ValueViewer, VerticalValuePicker
 
 PLANETS: list[str] = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
 
@@ -61,23 +59,23 @@ class OrbitsPage(QtWidgets.QWidget):
         toolbar = NavigationToolbar(self.figure_canvas, self)
         graph_layout.addWidget(toolbar)
         graph_layout.addWidget(self.figure_canvas)
-        settings_btn_layout = QtWidgets.QHBoxLayout()
-        settings_btn_layout.addStretch()
-        settings_button = QtWidgets.QPushButton("Settings")
-        settings_button.clicked.connect(self.on_settings_button_click)
-        settings_btn_layout.addWidget(settings_button)
-        settings_btn_layout.addStretch()
+        settings_btn_layout = SettingsBtnLayout(on_click=self.on_settings_button_click,
+                                                btn_width=150)
         graph_layout.addLayout(settings_btn_layout)
         root_layout.addLayout(graph_layout)
         #
         # Creating layout and widgets for user to pick planet to see orbit stats on
         #
-        planet_picker_layout = QtWidgets.QHBoxLayout()
-        planet_picker_layout.addWidget(QtWidgets.QLabel("Planet: "))
-        planet_picker_dropdown = QtWidgets.QComboBox()
-        planet_picker_dropdown.addItems(PLANETS)
-        planet_picker_dropdown.currentIndexChanged.connect(self.on_planet_dropdown_changed)
-        planet_picker_layout.addWidget(planet_picker_dropdown)
+        planet_picker_layout = HorizontalValuePicker(
+            lbl_text="Planet: ",
+            value_type="from_multiple",
+            default_val="Earth",
+            choices=PLANETS,
+            tooltip="Choose the name of the planet to see orbit stats on",
+            on_change=self.on_planet_dropdown_changed,
+            fixed_lbl_width=50,
+            fixed_form_width=150
+        )
         #
         # Creating layout and widgets to display planet orbit stats
         #
@@ -85,8 +83,12 @@ class OrbitsPage(QtWidgets.QWidget):
         self.stats_components: list[ValueViewer] = []
         for i, orbit_stat in enumerate(OrbitsPage.ORBITS_STATS.keys()):
             stat_name, stat_value = orbit_stat, OrbitsPage.ORBITS_STATS[orbit_stat]
-            stats_component = ValueViewer(stat_name)
-            stats_component.set_text(stat_value)
+            stats_component = ValueViewer(stat_name,
+                                          stat_value,
+                                          fixed_width=120,
+                                          fixed_key_height=20,
+                                          fixed_value_height=35,
+                                          alignment=QtCore.Qt.AlignmentFlag.AlignTop)
             self.stats_components.append(stats_component)
             stats_layout.addLayout(stats_component, i // 2, i % 2, 1, 1)
         controls_layout = QtWidgets.QVBoxLayout()
@@ -97,6 +99,7 @@ class OrbitsPage(QtWidgets.QWidget):
 
     def on_planet_dropdown_changed(self, new_index: int):
         new_planet: str = PLANETS[new_index]
+        print("NEW PLANET: ", new_planet)
         # TODO: add binding to engine to set new stats on the new planet
         pass
 
@@ -150,6 +153,7 @@ class OrbitsPageSettings(QtWidgets.QWidget):
         if self.settings.SETTINGS != self.original_settings:
             for k in self.original_settings.keys():
                 self.settings.SETTINGS[k] = self.original_settings[k]
+            self.centre_of_orbit_picker.set_value(self.settings.SETTINGS[SettingsKeys.CENTRE_OF_ORBIT.value])
             for widget in self.child_widgets:
                 widget.set_state()
 
@@ -159,32 +163,48 @@ class OrbitsPageSettings(QtWidgets.QWidget):
     def init_settings_widgets(self):
         top_half = QtWidgets.QHBoxLayout()
         top_half.addStretch()
-        centre_of_orbit_picker = CentreOfOrbitPicker(self.settings)
-        centre_of_orbit_picker.setContentsMargins(5, 5, 5, 5)
-        self.child_widgets.append(centre_of_orbit_picker)
-        top_half.addLayout(centre_of_orbit_picker)
-        objects_to_show_layout = QtWidgets.QVBoxLayout()
-        objects_to_show_layout.addWidget(QtWidgets.QLabel("Objects to show"))
-        for i in range(len(OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS)):
-            check_box = ObjToShowCheckbox(self.settings, OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS[i], self)
-            objects_to_show_layout.addWidget(check_box)
-            self.child_widgets.append(check_box)
-        objects_to_show_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignHCenter)
-        objects_to_show_layout.setContentsMargins(10, 5, 10, 5)
-        top_half.addLayout(objects_to_show_layout)
-        anim_speed_picker = AnimSpeedPicker(self.settings)
+        # centre_of_orbit_picker = CentreOfOrbitPicker(self.settings,
+        #                                              margin=[10, 10, 10, 10])
+        # self.child_widgets.append(centre_of_orbit_picker)
+        # top_half.addLayout(centre_of_orbit_picker)
+        self.centre_of_orbit_picker = VerticalValuePicker(value_type="from_multiple",
+                                                          lbl_text="Centre of orbit: ",
+                                                          choices=["Sun"] + PLANETS,
+                                                          padding=[10, 10, 10, 10],
+                                                          on_change=self.on_centre_of_orbit_changed)
+        self.centre_of_orbit_picker.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        #self.child_widgets.append(self.centre_of_orbit_picker)
+        top_half.addLayout(self.centre_of_orbit_picker)
+        objects_to_show = ObjToShowCheckboxGroup(self.settings,
+                                                 OrbitsPageSettings.OBJECTS_TO_SHOW_OPTIONS,
+                                                 margin=[10, 10, 10, 10])
+        self.child_widgets += objects_to_show.check_boxes
+        top_half.addLayout(objects_to_show)
+        anim_speed_picker = AnimSpeedPicker(self.settings,
+                                            alignment=QtCore.Qt.AlignmentFlag.AlignTop,
+                                            margins=[10, 10, 10, 10])
         self.child_widgets.append(anim_speed_picker)
         top_half.addLayout(anim_speed_picker)
         top_half.addStretch()
         self.controls_layout.addLayout(top_half)
         bottom_half = QtWidgets.QHBoxLayout()
-        view_type_picker = ViewTypePicker(self.settings)
+        bottom_half.addStretch()
+        view_type_picker = ViewTypePicker(self.settings,
+                                          margin=[10, 10, 10, 10],
+                                          alignment=QtCore.Qt.AlignmentFlag.AlignTop)
         self.child_widgets.append(view_type_picker)
         bottom_half.addLayout(view_type_picker)
-        orbit_time_picker = OrbitTimePicker(self.settings)
+        orbit_time_picker = OrbitTimePicker(self.settings,
+                                            fixed_width=150,
+                                            alignment=QtCore.Qt.AlignmentFlag.AlignTop,
+                                            margin=[10, 10, 10, 10])
         self.child_widgets.append(orbit_time_picker)
         bottom_half.addLayout(orbit_time_picker)
+        bottom_half.addStretch()
         self.controls_layout.addLayout(bottom_half)
+
+    def on_centre_of_orbit_changed(self, new_index: int):
+        self.settings.SETTINGS[SettingsKeys.CENTRE_OF_ORBIT.value] = self.centre_of_orbit_picker.choices[new_index]
 
 
 class SpirographPage(QtWidgets.QWidget):
@@ -202,32 +222,76 @@ class SpirographPage(QtWidgets.QWidget):
         graph_layout.addWidget(self.figure_canvas)
         root_layout.addLayout(graph_layout)
         controls_layout = QtWidgets.QVBoxLayout()
-        grid_layout = QtWidgets.QGridLayout()
-        self.planet1picker: PlanetPicker = PlanetPicker("Planet 1", "Venus")
-        self.planet2picker: PlanetPicker = PlanetPicker("Planet 2", "Earth")
-        self.time_diff_picker: FloatPicker = FloatPicker("Difference in time")
-        self.n_orbits: IntPicker = IntPicker("Number of orbits of outermost planet")
+        self.planet1picker: HorizontalValuePicker = HorizontalValuePicker(
+            value_type="from_multiple",
+            lbl_text="Planet 1: ",
+            default_val="Venus",
+            choices=PLANETS,
+            padding=[5, 5, 5, 5]
+        )
+        self.planet2picker: HorizontalValuePicker = HorizontalValuePicker(
+            value_type="from_multiple",
+            lbl_text="Planet 2: ",
+            default_val="Earth",
+            choices=PLANETS,
+            padding=[5, 5, 5, 5]
+        )
+        self.time_diff_picker: HorizontalValuePicker = HorizontalValuePicker(
+            value_type=float,
+            lbl_text="Δt: ",
+            tooltip="The time difference between drawing each line",
+            fixed_form_width=100,
+            fixed_lbl_width=20,
+            fixed_height=16,
+            padding=[5, 5, 5, 5])
+        self.n_orbits: HorizontalValuePicker = HorizontalValuePicker(
+            value_type=int,
+            lbl_text="N: ",
+            tooltip="Number of orbits of the outermost planet",
+            fixed_form_width=100,
+            fixed_lbl_width=20,
+            fixed_height=16)
 
-        grid_layout.addLayout(self.planet1picker, 0, 0, 1, 1)
-        grid_layout.addLayout(self.planet2picker, 0, 1, 1, 1)
-        grid_layout.addLayout(self.time_diff_picker, 1, 0, 1, 1)
-        grid_layout.addLayout(self.n_orbits, 1, 1, 1, 1)
-        controls_layout.addLayout(grid_layout)
+        param_picker_layout = QtWidgets.QVBoxLayout()
+        planet_picker_layout = QtWidgets.QHBoxLayout()
+        planet_picker_layout.addLayout(self.planet1picker)
+        planet_picker_layout.addLayout(self.planet2picker)
+        param_picker_layout.addLayout(planet_picker_layout)
+        num_picker_layout = QtWidgets.QHBoxLayout()
+        num_picker_layout.addLayout(self.time_diff_picker)
+        num_picker_layout.addLayout(self.n_orbits)
+        param_picker_layout.addLayout(num_picker_layout)
+        param_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        controls_layout.addLayout(param_picker_layout)
         eval_button = QtWidgets.QPushButton("Evaluate")
         eval_button.pressed.connect(self.on_eval_button_press)
+        controls_layout.addSpacing(20)
         controls_layout.addWidget(eval_button)
-        self.completed_orbits = ValueViewer("Completed orbits")
-        self.elapsed_time = ValueViewer("Elapsed time")
-        controls_layout.addLayout(self.completed_orbits)
-        controls_layout.addLayout(self.elapsed_time)
+        values_layout = QtWidgets.QHBoxLayout()
+        self.completed_orbits = ValueViewer("Completed orbits",
+                                            fixed_key_height=20,
+                                            fixed_value_height=50,
+                                            fixed_width=120,
+                                            alignment=QtCore.Qt.AlignmentFlag.AlignTop)
+        self.elapsed_time = ValueViewer("Elapsed time",
+                                        fixed_key_height=20,
+                                        fixed_value_height=50,
+                                        fixed_width=120,
+                                        alignment=QtCore.Qt.AlignmentFlag.AlignTop)
+        values_layout.addLayout(self.completed_orbits)
+        values_layout.addLayout(self.elapsed_time)
+        values_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        controls_layout.addSpacing(20)
+        controls_layout.addLayout(values_layout)
+        controls_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         root_layout.addLayout(controls_layout)
         self.setLayout(root_layout)
 
     def on_eval_button_press(self):
-        print(self.planet1picker.picker.currentText(),
-              self.planet2picker.picker.currentText(),
-              self.time_diff_picker.line_edit.text(),
-              self.n_orbits.line_edit.text())
+        print(self.planet1picker.get_value(),
+              self.planet2picker.get_value(),
+              self.time_diff_picker.get_value(),
+              self.n_orbits.get_value())
         # TODO: integrate functionality to plot spirograph based on input parameters
 
 

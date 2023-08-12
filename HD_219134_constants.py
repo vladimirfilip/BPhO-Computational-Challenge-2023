@@ -5,6 +5,7 @@ from enum import Enum
 #
 from decimal import Decimal
 
+
 class Planets(Enum):
     HD_219134: "HD 219314"
     b: "HD 219314 b"
@@ -14,6 +15,7 @@ class Planets(Enum):
     g: "HD 219314 g"
     h: "HD 219314 h"
 
+
 class Eccentricity(Enum):
     b: Decimal(0)
     c: Decimal(0.062)
@@ -21,6 +23,7 @@ class Eccentricity(Enum):
     d: Decimal(0.138)
     g: Decimal(0)
     h: Decimal(0.06)
+
 
 class SemiMajorAxis(Enum):
     b: Decimal(0.03876)
@@ -30,6 +33,7 @@ class SemiMajorAxis(Enum):
     g: Decimal(0.3753)
     h: Decimal(3.11)
 
+
 class SemiMinorAxis(Enum):
     b: SemiMajorAxis.b.value * (Decimal(1) - Eccentricity.b.value ** 2)
     c: SemiMajorAxis.c.value * (Decimal(1) - Eccentricity.c.value ** 2)
@@ -38,6 +42,7 @@ class SemiMinorAxis(Enum):
     g: SemiMajorAxis.g.value * (Decimal(1) - Eccentricity.g.value ** 2)
     h: SemiMajorAxis.h.value * (Decimal(1) - Eccentricity.h.value ** 2)
 
+
 class OrbitalPeriod(Enum):
     b: Decimal(3.092926)
     c: Decimal(6.76458)
@@ -45,6 +50,7 @@ class OrbitalPeriod(Enum):
     d: Decimal(46.859)
     g: Decimal(94.2)
     h: Decimal(2100.6)
+
 
 class InclinationAngle(Enum):
     b: Decimal(85.05)

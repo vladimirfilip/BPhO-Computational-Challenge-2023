@@ -55,6 +55,8 @@ class Animation2D:
             e_centre = Eccentricity[self._centre].value
             r_centre = float(b_centre) / (1 - float(e_centre) * np.cos(theta))
             x_centre = r_centre * np.cos(theta)
+            print("x centre")
+            print(x_centre)
             y_centre = r_centre * np.sin(theta)
             self._centre_line_vals = (x_centre, y_centre)
 
@@ -64,16 +66,20 @@ class Animation2D:
             r = float(b) / (1 - float(e) * np.cos(theta))
             x = r * np.cos(theta)
             y = r * np.sin(theta)
-
+            print("x vals")
+            print(x)
+            print("x diff")
+            print(x - self._centre_line_vals[0])
             # Subtracts coordinates of reference planet at each corresponding orbital angle
             self._line_data[planet] = (x - self._centre_line_vals[0], y - self._centre_line_vals[1])
 
     def calculate_anim_vals(self):
         periods = [OrbitalPeriod[planet].value for planet in self._planets]
-        max_period = max(periods)
+        max_period = float(max(periods))
 
         # Calculates total number of frames that will make up animation
         self._num_frames = round((self._orbit_duration * 1000) / Animation2D.FRAME_DURATION)
+        print(self._num_frames)
         time_vals = np.linspace(0, max_period, self._num_frames)
 
         if self._centre != Planet.SUN.name:
@@ -112,7 +118,9 @@ class Animation2D:
         # Initialises line objects for orbital paths and points
         for planet in self._planets:
             self._anims.append(self._ax.plot([], [], "ro")[0])
-            self._lines.append(self._ax.plot(self._line_data[planet][0], self._line_data[planet][1], lw=3)[0])
+            print("x data")
+            print(self._line_data[planet][0])
+            self._lines.append(self._ax.plot(self._anim_data[planet][0], self._anim_data[planet][1], lw=3)[0])
 
         ani = FuncAnimation(self._fig,
                             self.animate,
@@ -122,4 +130,7 @@ class Animation2D:
                             blit=True,
                             init_func=self.init_func)
         plt.show()
-        ani.save("2d_animation.gif", fps=25)
+        #ani.save("2d_animation.gif", fps=50)
+
+if __name__ == "__main__":
+    Animation2D(["MERCURY", "EARTH", "MARS"], "VENUS", 2)
