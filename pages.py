@@ -18,7 +18,7 @@ from spiro_animation import SpiroAnimation
 
 matplotlib.use('TkAgg')
 
-PLANETS: list[str] = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune"]
+PLANETS: list[str] = ["Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus", "Neptune", "Pluto"]
 
 
 class PageIndexes(Enum):
@@ -40,6 +40,7 @@ class OrbitsPage(QtWidgets.QWidget):
         "Semi-major axis": None,
         "Semi-minor axis": None,
         "Orbital period": None,
+        "Inclination angle": None,
     }
 
     def __init__(self, parent):
@@ -47,6 +48,9 @@ class OrbitsPage(QtWidgets.QWidget):
         self.parent = parent
         self.setParent(parent)
         root_layout = QtWidgets.QHBoxLayout()
+        #
+        # Initialises simulation settings class with default settings
+        #
         self.sim_settings = OrbitSimSettings()
         #
         # Creating the graph canvas and the toolbar to manipulate it
@@ -64,7 +68,6 @@ class OrbitsPage(QtWidgets.QWidget):
         root_layout.addLayout(self.graph_layout)
         self.anim = None
         self.display_animation()
-        # self.anim = Animation2D(self.fig, "SOLAR_SYSTEM", ["VENUS", "EARTH"], 10, 700, 0.1)
         #
         # Creating layout and widgets for user to pick planet to see orbit stats on
         #
@@ -111,10 +114,11 @@ class OrbitsPage(QtWidgets.QWidget):
         self.parent.switch_to(PageIndexes.ORBITS_PAGE_SETTINGS.value)
 
     def update_graph(self):
+        #
         # Called when simulation settings have been updated
+        #
         self.planet_picker_layout.set_choices(self.sim_settings.SETTINGS[SettingsKeys.OBJECTS_TO_SHOW.value], 0)
         self.display_animation()
-        pass
 
     def set_stats(self, new_stats: dict[str, str]):
         assert len(new_stats) == len(OrbitsPage.ORBITS_STATS)
@@ -166,6 +170,7 @@ class OrbitsPage(QtWidgets.QWidget):
         a: Decimal = solar_system_class.SemiMajorAxis[planet_enum_key].value * au_in_metres
         m: Decimal = solar_system_class.Mass[planet_enum_key].value * earth_mass
         P: Decimal = solar_system_class.OrbitalPeriod[planet_enum_key].value
+        beta: Decimal = solar_system_class.InclinationAngle[planet_enum_key].value
         theta: float = theta_angles[i] % float(Decimal('2') * Decimal(pi))
         coords: list[float] = coords[i]
         r = b / (Decimal('1') - e * Decimal(cos(theta)))
@@ -174,7 +179,7 @@ class OrbitsPage(QtWidgets.QWidget):
         OrbitsPage.ORBITS_STATS = {
             "Coordinates": ",\n".join([str(round(coord, 6)) + " a.u." for coord in coords]),
             "Mass": f"{round(float(m), 6)} kg",
-            "Angular velocity": f"{round(w, 14)} m/s",
+            "Angular velocity": f"{round(w, 10)} m/s",
             "Linear velocity": f"{round(v, 6)} m/s",
             "Distance from centre": f"{round(sqrt(sum(n * n for n in coords)), 6)} a.u.",
             "Distance from star": f"{round(float(r / au_in_metres), 6)} a.u.",
@@ -183,6 +188,7 @@ class OrbitsPage(QtWidgets.QWidget):
             "Semi-major axis": f"{round(a / au_in_metres, 6)} a.u.",
             "Semi-minor axis": f"{round(b / au_in_metres, 6)} a.u.",
             "Orbital period": f"{round(float(P), 6)} years",
+            "Inclination angle": f"{round(float(beta), 6)} rad"
         }
 
         for i, k in enumerate(OrbitsPage.ORBITS_STATS.keys()):
@@ -381,7 +387,7 @@ class SpirographPage(QtWidgets.QWidget):
             choices=["slow", "medium", "fast"],
             default_val="fast",
             fixed_form_width=75,
-            fixed_lbl_width=45,
+            fixed_lbl_width=60,
             fixed_height=25,
             padding=[5, 5, 5, 5])
         self.n_orbits: HorizontalValuePicker = HorizontalValuePicker(
@@ -424,18 +430,18 @@ class SpirographPage(QtWidgets.QWidget):
         controls_layout.addSpacing(20)
         controls_layout.addWidget(eval_button)
         values_layout = QtWidgets.QHBoxLayout()
+        values_layout.addStretch()
         self.completed_orbits = ValueViewer("Completed orbits",
-                                            fixed_key_height=20,
                                             fixed_value_height=50,
                                             fixed_width=120,
                                             alignment=QtCore.Qt.AlignmentFlag.AlignTop)
         self.elapsed_time = ValueViewer("# of lines",
-                                        fixed_key_height=20,
                                         fixed_value_height=50,
-                                        fixed_width=120,
+                                        fixed_width=60,
                                         alignment=QtCore.Qt.AlignmentFlag.AlignTop)
         values_layout.addLayout(self.completed_orbits)
         values_layout.addLayout(self.elapsed_time)
+        values_layout.addStretch()
         values_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addSpacing(20)
         controls_layout.addLayout(values_layout)

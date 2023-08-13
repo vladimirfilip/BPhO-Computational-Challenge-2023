@@ -320,6 +320,7 @@ class ValueViewer(QtWidgets.QVBoxLayout):
                  *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.key_label = QtWidgets.QLabel(k)
+        self.key_label.setWordWrap(True)
         self.addWidget(self.key_label)
         if fixed_key_height:
             self.key_label.setFixedHeight(fixed_key_height)
