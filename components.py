@@ -7,6 +7,10 @@ from proxima_centauri_constants import ProximaCentauri
 from solar_system_constants import SolarSystem
 from HD_219134_constants import HD219134
 
+
+#
+# Simple settings button component
+#
 class SettingsBtnLayout(QtWidgets.QHBoxLayout):
     def __init__(self, on_click: Callable, btn_width: Optional[int] = None, btn_height: Optional[int] = None, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -52,6 +56,10 @@ solar_system_enum_to_class: dict = {
 }
 
 
+#
+# Class that has a single static variable SETTINGS.
+# Both OrbitPageSettings and OrbitPage have an instance of OrbitSimSettings, and so when OrbitPageSettings manipulates the SETTINGS attribute, that change is also made in the OrbitPage instance
+#
 class OrbitSimSettings:
     SETTINGS: dict = {
         SettingsKeys.STAR_SYSTEM.value: DEFAULT_STAR_SYSTEM,
@@ -69,6 +77,9 @@ class CheckBox(QtWidgets.QCheckBox):
         self.toggled.connect(on_change)
 
 
+#
+# Component that allows the user to choose 2D or 3D in the orbit simulation settings
+#
 class ViewTypePicker(QtWidgets.QVBoxLayout):
     def __init__(self, settings: OrbitSimSettings, *args, **kwargs):
         margin = kwargs.pop("margin", None)
@@ -105,46 +116,9 @@ class ViewTypePicker(QtWidgets.QVBoxLayout):
         self._2d_view_type_btn.setChecked(self.settings.SETTINGS[self.settings_key] == ViewType.TWO_D.value)
 
 
-class OrbitTimePicker(QtWidgets.QVBoxLayout):
-    __MIN_VAL: int = 1
-    __MAX_VAL: int = 10
-    __TICK_INTERVAL: int = 1
-
-    def __init__(self, settings: OrbitSimSettings, *args, **kwargs):
-        fixed_width = kwargs.pop("fixed_width", None)
-        margin = kwargs.pop("margin", None)
-        alignment = kwargs.pop("alignment", None)
-        super().__init__(*args, **kwargs)
-        self.settings: OrbitSimSettings = settings
-        self.settings_key: str = SettingsKeys.ORBIT_TIME.value
-        self.label = QtWidgets.QLabel("Orbit time (for longest orbit)")
-        self.label.setStyleSheet("font-weight: bold;")
-        self.addWidget(self.label)
-        self.orbit_time_slider = QtWidgets.QSlider(QtCore.Qt.Orientation.Horizontal)
-        self.orbit_time_slider.setMinimum(OrbitTimePicker.__MIN_VAL)
-        self.orbit_time_slider.setMaximum(OrbitTimePicker.__MAX_VAL)
-        self.set_state()
-        self.orbit_time_slider.setTickPosition(QtWidgets.QSlider.TickPosition.TicksBelow)
-        self.orbit_time_slider.setTickInterval(OrbitTimePicker.__TICK_INTERVAL)
-        self.orbit_time_slider.valueChanged.connect(self.update_orbit_time)
-        if fixed_width:
-            self.orbit_time_slider.setFixedWidth(fixed_width)
-        self.addWidget(self.orbit_time_slider)
-        self.orbit_time_indicator = QtWidgets.QLabel(f"{self.orbit_time_slider.value()} s")
-        self.addWidget(self.orbit_time_indicator)
-        if margin:
-            self.setContentsMargins(*margin)
-        if alignment:
-            self.setAlignment(alignment)
-
-    def update_orbit_time(self, new_value: int):
-        self.settings.SETTINGS[self.settings_key] = new_value
-        self.orbit_time_indicator.setText(f"{self.orbit_time_slider.value()} s")
-
-    def set_state(self):
-        self.orbit_time_slider.setValue(self.settings.SETTINGS[self.settings_key])
-
-
+#
+# Generic component for a horizontal widget that can be used to choose values ranging from integers to an item from a dropdown
+#
 class HorizontalValuePicker(QtWidgets.QHBoxLayout):
     def __init__(self, value_type: type | str, lbl_text: str, default_val=None, choices: Optional[list] = None,
                  tooltip: Optional[str] = None, on_change: Optional[Callable] = None,
@@ -211,6 +185,9 @@ class HorizontalValuePicker(QtWidgets.QHBoxLayout):
             self.addWidget(self.form)
 
 
+#
+# Generic component for a vertical widget that can be used to choose values ranging from integers to an item from a dropdown
+#
 class VerticalValuePicker(QtWidgets.QVBoxLayout):
     def __init__(self, value_type: type | str, lbl_text: str, default_val=None, choices: Optional[list] = None,
                  tooltip: Optional[str] = None, on_change: Optional[Callable] = None,
@@ -252,7 +229,7 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
             self.choices = choices
             self.checkboxes = []
             for choice in choices:
-                checkbox = CheckBox(lambda : on_change(self.checkboxes),
+                checkbox = CheckBox(lambda: on_change(self.checkboxes),
                                     choice)
                 self.addWidget(checkbox)
                 self.checkboxes.append(checkbox)
@@ -288,7 +265,7 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
                 self.removeWidget(self.checkboxes.pop())
             while len(self.checkboxes) < len(choices):
                 self.checkboxes.append(CheckBox(
-                    lambda : self.on_change(self.checkboxes),
+                    lambda: self.on_change(self.checkboxes),
                     ""
                 ))
                 self.addWidget(self.checkboxes[-1])
@@ -296,7 +273,6 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
                 self.checkboxes[i].setText(choice)
                 if check_all:
                     self.checkboxes[i].setChecked(True)
-
 
     def set_value(self, new_value):
         if self.value_type in [int, float, str]:
@@ -313,6 +289,9 @@ class VerticalValuePicker(QtWidgets.QVBoxLayout):
                     self.form[i].setChecked(False)
 
 
+#
+# Generic label component for users to view a certain statistic
+#
 class ValueViewer(QtWidgets.QVBoxLayout):
     def __init__(self, k: str, v: str = "-", fixed_key_height: Optional[int] = None,
                  fixed_value_height: Optional[int] = None, fixed_width: Optional[int] = None,
