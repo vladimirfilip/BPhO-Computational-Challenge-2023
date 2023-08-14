@@ -99,6 +99,7 @@ class SolarSystem:
         PLUTO = Decimal('248.348')
 
     class InclinationAngle(Enum):
+        SUN = Decimal('0')
         MERCURY = Decimal('0.1222')
         VENUS = Decimal('0.05917')
         EARTH = Decimal('0')

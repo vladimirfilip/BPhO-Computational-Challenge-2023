@@ -30,13 +30,16 @@ class ProximaCentauri:
         b = Decimal('0.04857')
 
     class SemiMinorAxis(Enum):
+        PROXIMA_CENTAURI = Decimal('0')
         d = Decimal('0.0288038')
         b = Decimal('0.0479930')
 
     class OrbitalPeriod(Enum):
+        PROXIMA_CENTAURI = Decimal('0')
         d = Decimal('5.122') / Decimal('365')
         b = Decimal('11.18418') / Decimal('365')
 
     class InclinationAngle(Enum):
+        PROXIMA_CENTAURI = Decimal('0')
         d = Decimal('0')
         b = Decimal('0')

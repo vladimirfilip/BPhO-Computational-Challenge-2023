@@ -174,7 +174,11 @@ class OrbitsPage(QtWidgets.QWidget):
         solar_system = self.sim_settings.SETTINGS[SettingsKeys.STAR_SYSTEM.value]
         solar_system_class = solar_system_enum_to_class[solar_system]
         try:
-            planet_enum_key = solar_system_class.Planet(planet_name).name
+            if planet_name == solar_system_class.SUN:
+                planet_enum_key = solar_system_class.Planet(
+                    self.sim_settings.SETTINGS[SettingsKeys.CENTRE_OF_ORBIT.value]).name
+            else:
+                planet_enum_key = solar_system_class.Planet(planet_name).name
         except ValueError:
             # star system is being actively changed in settings, and so refreshing is paused until everything is synced
             return
@@ -201,8 +205,14 @@ class OrbitsPage(QtWidgets.QWidget):
         # Calculates orbital radius, linear velocity and angular velocity (relative to the star), using these constants
         #
         r = b / (Decimal('1') - e * Decimal(cos(theta)))
-        v = sqrt(G * M * (Decimal('2') / r - Decimal('1') / a))
-        w = Decimal(v) / r
+        if a == 0:
+            v = 0
+        else:
+            v = sqrt(G * M * (Decimal('2') / r - Decimal('1') / a))
+        if r == 0:
+            w = 0
+        else:
+            w = Decimal(v) / r
         #
         # Rounds these values, adds units and sets text of the relevant labels to these new statistics
         #

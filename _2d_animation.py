@@ -53,7 +53,7 @@ class Animation2D:
         self._centre_anim_vals = (0, 0)
 
         # Duration of outermost orbit in seconds
-        self._orbit_duration = orbit_duration
+        self._orbit_duration = orbit_duration / 2
 
         self.colours = Animation2D.COLOURS.copy()
         shuffle(self.colours)
@@ -73,6 +73,8 @@ class Animation2D:
 
     def calculate_line_vals(self):
         periods = [float(self.constants.OrbitalPeriod[planet].value) for planet in self._planets]
+        if self.constants.SUN in self._planets:
+            periods.append(float(self.constants.OrbitalPeriod[self._centre].value))
         max_period = max(periods)
         # Calculates total number of frames that will make up animation
         time_vals = np.linspace(0, max_period * self._num_orbits, 1000 * self._num_orbits)
@@ -84,9 +86,13 @@ class Animation2D:
                                                                    planet=self._centre,
                                                                    solar_system=self._solar_system)
         for planet in self._planets:
-            theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
-            x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta, planet=planet,
-                                                           solar_system=self._solar_system)
+            if planet == self.constants.SUN:
+                x_vals = 0 * time_vals
+                y_vals = 0 * time_vals
+            else:
+                theta = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+                x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta, planet=planet,
+                                                               solar_system=self._solar_system)
 
             # Subtracts coordinates of reference planet at each corresponding orbital angle
             self._line_data[planet] = (x_vals - self._centre_line_vals[0], y_vals - self._centre_line_vals[1])
@@ -103,6 +109,8 @@ class Animation2D:
 
     def calculate_anim_vals(self):
         periods = [float(self.constants.OrbitalPeriod[planet].value) for planet in self._planets]
+        if self.constants.SUN in self._planets:
+            periods.append(float(self.constants.OrbitalPeriod[self._centre].value))
         max_period = max(periods)
 
         # Calculates total number of frames that will make up animation
@@ -117,11 +125,18 @@ class Animation2D:
                                                                    solar_system=self._solar_system)
 
         for planet in self._planets:
-            theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
-            self._theta_vals[planet] += list(theta_vals)
-            x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta_vals,
-                                                           planet=planet,
-                                                           solar_system=self._solar_system)
+            if planet == self.constants.SUN:
+                x_vals = 0 * time_vals
+                y_vals = 0 * time_vals
+                theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[self._centre].value)
+                self._theta_vals[planet] += list(theta_vals)
+
+            else:
+                theta_vals = (2 * math.pi * time_vals) / float(self.constants.OrbitalPeriod[planet].value)
+                self._theta_vals[planet] += list(theta_vals)
+                x_vals, y_vals = CalcFunctions.orbital_vals_2d(theta_vals=theta_vals,
+                                                               planet=planet,
+                                                               solar_system=self._solar_system)
             self._anim_data[planet] = (x_vals - self._centre_anim_vals[0], y_vals - self._centre_anim_vals[1])
 
     def init_func(self):

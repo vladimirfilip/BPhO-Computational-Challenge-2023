@@ -17,6 +17,7 @@ class TauCeti:
         f = "Tau Ceti f"
 
     class Mass(Enum):
+        TAU_CETI = Decimal('260703')
         g = Decimal('1.75')
         h = Decimal('1.83')
         e = Decimal('3.93')
@@ -52,6 +53,7 @@ class TauCeti:
         f = Decimal('636.13') / Decimal('365')
 
     class InclinationAngle(Enum):
+        TAU_CETI = Decimal('0')
         g = Decimal('0')
         h = Decimal('0')
         e = Decimal('0')

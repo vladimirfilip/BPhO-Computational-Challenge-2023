@@ -28,6 +28,7 @@ class HD219134:
         h = Decimal('0.34') * Decimal('317.907')
 
     class Eccentricity(Enum):
+        HD_219134 = Decimal('0')
         b = Decimal('0')
         c = Decimal('0.062')
         f = Decimal('0.148')
@@ -36,6 +37,7 @@ class HD219134:
         h = Decimal('0.06')
 
     class SemiMajorAxis(Enum):
+        HD_219134 = Decimal('0')
         b = Decimal('0.03876')
         c = Decimal('0.06530')
         f = Decimal('0.1463')
@@ -44,6 +46,7 @@ class HD219134:
         h = Decimal('3.11')
 
     class SemiMinorAxis(Enum):
+        HD_219134 = Decimal('0')
         b = Decimal('0.03876')
         c = Decimal('0.06504899')
         f = Decimal('0.143095')
@@ -52,6 +55,7 @@ class HD219134:
         h = Decimal('3.09880')
 
     class OrbitalPeriod(Enum):
+        HD_219134 = Decimal('0')
         b = Decimal('3.092926') / Decimal('365')
         c = Decimal('6.76458') / Decimal('365')
         f = Decimal('22.717') / Decimal('365')
@@ -60,6 +64,7 @@ class HD219134:
         h = Decimal('2100.6') / Decimal('365')
 
     class InclinationAngle(Enum):
+        HD_219134 = Decimal('0')
         b = Decimal('1.4844')
         c = Decimal('1.5233')
         f = Decimal('0')
