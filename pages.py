@@ -351,7 +351,6 @@ class OrbitsPageSettings(QtWidgets.QWidget):
                                                      lbl_text="Orbit time (s): ",
                                                      fixed_width=100,
                                                      tooltip="Orbit time for the longest orbit in seconds",
-                                                     fixed_lbl_height=30,
                                                      fixed_form_height=30,
                                                      padding=[10, 10, 10, 10],
                                                      on_change=self.on_orbit_time_changed)
@@ -360,7 +359,7 @@ class OrbitsPageSettings(QtWidgets.QWidget):
         self.num_orbits_picker = VerticalValuePicker(value_type=int,
                                                      lbl_text="Number of orbits: ",
                                                      fixed_width=150,
-                                                     fixed_lbl_height=30,
+                                                     tooltip="Number of orbits of the outermost planet",
                                                      fixed_form_height=30,
                                                      padding=[10, 10, 10, 10],
                                                      on_change=self.on_num_orbits_changed)
