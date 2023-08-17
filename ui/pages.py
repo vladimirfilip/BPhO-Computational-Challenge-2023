@@ -451,9 +451,7 @@ class SpirographPage(QtWidgets.QWidget):
             fixed_form_width=120,
             on_change=self.on_star_system_changed
         )
-        #self.star_system_picker.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         star_system_layout.addLayout(self.star_system_picker)
-        #star_system_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addLayout(star_system_layout)
         param_picker_layout = QtWidgets.QVBoxLayout()
         planet_picker_layout = QtWidgets.QHBoxLayout()
@@ -502,7 +500,6 @@ class SpirographPage(QtWidgets.QWidget):
         num_picker_layout.addLayout(self.speed_picker)
         num_picker_layout.addLayout(self.n_orbits)
         param_picker_layout.addLayout(num_picker_layout)
-        #param_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addLayout(param_picker_layout)
         controls_layout.addSpacing(20)
         eval_button_layout = QtWidgets.QHBoxLayout()
@@ -510,7 +507,6 @@ class SpirographPage(QtWidgets.QWidget):
         eval_button.pressed.connect(self.on_eval_button_press)
         eval_button.setFixedWidth(250)
         eval_button_layout.addWidget(eval_button)
-        #eval_button_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addLayout(eval_button_layout)
         controls_layout.addSpacing(20)
         values_layout = QtWidgets.QHBoxLayout()
