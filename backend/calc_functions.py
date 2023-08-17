@@ -1,5 +1,5 @@
 import numpy as np
-from constants import Constants
+from backend.constants import Constants
 
 class CalcFunctions:
     @staticmethod

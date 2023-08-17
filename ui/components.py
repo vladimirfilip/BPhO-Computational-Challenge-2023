@@ -2,10 +2,10 @@ from typing import Callable, Optional
 
 from PyQt6 import QtCore, QtGui, QtWidgets
 from enum import Enum
-from tau_ceti_constants import TauCeti
-from proxima_centauri_constants import ProximaCentauri
-from solar_system_constants import SolarSystem
-from HD_219134_constants import HD219134
+from backend.tau_ceti_constants import TauCeti
+from backend.proxima_centauri_constants import ProximaCentauri
+from backend.solar_system_constants import SolarSystem
+from backend.HD_219134_constants import HD219134
 
 
 #
@@ -21,7 +21,7 @@ class SettingsBtnLayout(QtWidgets.QHBoxLayout):
         if btn_height:
             self.btn.setFixedHeight(btn_height)
         self.btn.clicked.connect(on_click)
-        self.btn.setIcon(QtGui.QIcon('settingsicon.png'))
+        self.btn.setIcon(QtGui.QIcon('ui\settingsicon.png'))
         self.addWidget(self.btn)
 
 

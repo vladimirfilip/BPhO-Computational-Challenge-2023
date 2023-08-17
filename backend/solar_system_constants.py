@@ -109,8 +109,3 @@ class SolarSystem:
         URANUS = Decimal('0.01344')
         NEPTUNE = Decimal('0.03089')
         PLUTO = Decimal('0.3054')
-
-    class GlobalConstants(Enum):
-        FRAME_RATE = 47
-        FRAME_INTERVAL = 40
-        G_CONSTANT = Decimal('6.67') * Decimal('10') ** Decimal('-11')

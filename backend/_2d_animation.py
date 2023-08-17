@@ -6,8 +6,8 @@ from matplotlib.animation import FuncAnimation
 from random import shuffle
 import numpy as np
 import math
-from constants import Constants
-from calc_functions import CalcFunctions
+from backend.constants import Constants
+from backend.calc_functions import CalcFunctions
 
 matplotlib.use('TkAgg')
 

@@ -1,7 +1,7 @@
 from typing import Callable
 
 from PyQt6 import QtWidgets, QtGui, QtCore
-from pages import OrbitsPage, SpirographPage, OrbitsPageSettings, PageClasses, PageIndexes
+from ui.pages import OrbitsPage, SpirographPage, OrbitsPageSettings, PageClasses, PageIndexes
 import sys
 
 

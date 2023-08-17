@@ -3,10 +3,10 @@ from typing import Callable, Optional
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from constants import Constants
+from backend.constants import Constants
 import numpy as np
 import math
-from calc_functions import CalcFunctions
+from backend.calc_functions import CalcFunctions
 from random import sample
 
 matplotlib.use('TkAgg')

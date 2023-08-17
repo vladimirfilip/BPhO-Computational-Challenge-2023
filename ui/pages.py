@@ -8,13 +8,13 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 from math import cos, sqrt, pi
 
-from _2d_animation import Animation2D
-from _3d_animation import Animation3D
-from components import OrbitSimSettings, ViewTypePicker, SettingsKeys, ViewType, SettingsBtnLayout, \
+from backend._2d_animation import Animation2D
+from backend._3d_animation import Animation3D
+from ui.components import OrbitSimSettings, ViewTypePicker, SettingsKeys, ViewType, SettingsBtnLayout, \
     HorizontalValuePicker, ValueViewer, VerticalValuePicker, StarSystem, solar_system_enum_to_class
 import matplotlib
 
-from spiro_animation import SpiroAnimation
+from backend.spiro_animation import SpiroAnimation
 
 matplotlib.use('TkAgg')
 
@@ -441,7 +441,6 @@ class SpirographPage(QtWidgets.QWidget):
         controls_layout = QtWidgets.QVBoxLayout()
         controls_layout.addStretch()
         star_system_layout = QtWidgets.QHBoxLayout()
-        star_system_layout.addStretch()
         self.star_system_picker = HorizontalValuePicker(
             value_type="from_multiple",
             lbl_text="Star System: ",
@@ -452,14 +451,18 @@ class SpirographPage(QtWidgets.QWidget):
             fixed_form_width=120,
             on_change=self.on_star_system_changed
         )
+        #self.star_system_picker.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         star_system_layout.addLayout(self.star_system_picker)
-        star_system_layout.addStretch()
+        #star_system_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addLayout(star_system_layout)
         param_picker_layout = QtWidgets.QVBoxLayout()
         planet_picker_layout = QtWidgets.QHBoxLayout()
+        planet_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         self.planet1picker: HorizontalValuePicker = HorizontalValuePicker(
             value_type="from_multiple",
             lbl_text="Planet 1: ",
+            fixed_lbl_width=75,
+            fixed_form_width=100,
             default_val="Venus",
             choices=PLANETS,
             padding=[5, 5, 5, 5]
@@ -467,6 +470,8 @@ class SpirographPage(QtWidgets.QWidget):
         self.planet2picker: HorizontalValuePicker = HorizontalValuePicker(
             value_type="from_multiple",
             lbl_text="Planet 2: ",
+            fixed_lbl_width=75,
+            fixed_form_width=100,
             default_val="Earth",
             choices=PLANETS,
             padding=[5, 5, 5, 5]
@@ -492,26 +497,31 @@ class SpirographPage(QtWidgets.QWidget):
             default_val=10,
             fixed_form_width=100,
             fixed_lbl_width=20,
-            fixed_height=25)
+            fixed_height=25,
+            padding=[5, 5, 5, 5])
         num_picker_layout.addLayout(self.speed_picker)
         num_picker_layout.addLayout(self.n_orbits)
         param_picker_layout.addLayout(num_picker_layout)
-        param_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        #param_picker_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
         controls_layout.addLayout(param_picker_layout)
         controls_layout.addSpacing(20)
+        eval_button_layout = QtWidgets.QHBoxLayout()
         eval_button = QtWidgets.QPushButton("Evaluate")
         eval_button.pressed.connect(self.on_eval_button_press)
-        controls_layout.addWidget(eval_button)
+        eval_button.setFixedWidth(250)
+        eval_button_layout.addWidget(eval_button)
+        #eval_button_layout.setAlignment(QtCore.Qt.AlignmentFlag.AlignTop)
+        controls_layout.addLayout(eval_button_layout)
         controls_layout.addSpacing(20)
         values_layout = QtWidgets.QHBoxLayout()
         values_layout.addStretch()
         self.completed_orbits = ValueViewer("Completed orbits",
                                             fixed_value_height=50,
-                                            fixed_width=120,
+                                            fixed_width=100,
                                             alignment=QtCore.Qt.AlignmentFlag.AlignTop)
         self.elapsed_time = ValueViewer("# of lines",
                                         fixed_value_height=50,
-                                        fixed_width=60,
+                                        fixed_width=80,
                                         alignment=QtCore.Qt.AlignmentFlag.AlignTop)
         values_layout.addLayout(self.completed_orbits)
         values_layout.addLayout(self.elapsed_time)
@@ -520,6 +530,8 @@ class SpirographPage(QtWidgets.QWidget):
         controls_layout.addLayout(values_layout)
         controls_layout.addStretch()
         root_layout.addLayout(controls_layout)
+        root_layout.setStretch(1, 0)
+        root_layout.setStretch(0, 1)
         self.setLayout(root_layout)
         self.display_animation()
 
