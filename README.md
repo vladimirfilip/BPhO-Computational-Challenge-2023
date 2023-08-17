@@ -1,9 +1,9 @@
-# ![Alt](/appicon.ico "App icon") Solar System Orbits
+# ![Alt](ui/appicon.ico "App icon") Solar System Orbits
 
 
 By: Constantin Filip, Vladimir Filip
 
-This is a Windows desktop app that is the extension of the 7 tasks implemented for the Computational Challenge.
+This is a Windows desktop app that is the extension of the 7 tasks implemented for the Computational Challenge (for the full brief of the Challenge click [here](https://www.bpho.org.uk/bpho/computational-challenge/BPhO_CompPhys_Challenge_2023_briefing.pdf))
 
 To view the demo of our Computational Challenge submission, click [here](https://www.youtube.com/watch?v=9tV5P1YHzHM) (skip to [1:00](https://youtu.be/9tV5P1YHzHM?t=61) for the demo of this app)
 
