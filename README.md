@@ -25,7 +25,7 @@ See the Releases section to install.
 
 
 ## Technical overview ##
-For the mathematical foundation and details of technical design, click [here](BPhoPaper.pdf)
+For the mathematical foundation and details of technical design, see BPhoPaper.pdf
 
 ## Some screenshots ##
 
