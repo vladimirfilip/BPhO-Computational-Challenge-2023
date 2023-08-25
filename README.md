@@ -1,7 +1,7 @@
 # ![Alt](ui/appicon.ico "App icon") Solar System Orbits
 
 
-By: Constantin Filip, Vladimir Filip
+By: Constantin Filip & Vladimir Filip
 
 This is a Windows desktop app that is the extension of the 7 tasks implemented for the Computational Challenge (for the full brief of the Challenge click [here](https://www.bpho.org.uk/bpho/computational-challenge/BPhO_CompPhys_Challenge_2023_briefing.pdf))
 
@@ -21,11 +21,11 @@ See the Releases section to install.
 
 * Real-time spirograph generator.
     * Any two planets from any supported star system supported
-    * Orbit speed and number of orbits to be taken into account are customisable
+    * Orbit speed and number of orbits are customisable
 
 
 ## Technical overview ##
-For the mathematical foundation and details of technical design, see BPhoPaper.pdf
+For the mathematical foundation and details of technical design, see BPhOPaper.pdf
 
 ## Some screenshots ##
 
